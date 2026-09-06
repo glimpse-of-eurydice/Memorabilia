@@ -1,10 +1,12 @@
 # Thought Space v0
 
-Thought Space v0 is a bounded apparatus-validation case study. It records one
-neutral research encounter, preserves the agent's explicit note and graph
-proposal, applies a versioned external-state update, and tests whether the
-resulting topology changes deterministic retrieval before a separate probe
-turn consumes the retrieved context.
+Thought Space v0 is the graph-based observational apparatus inside
+**Memorabilia**, a research program about history-sensitive artificial
+development. This bounded validation case records one neutral encounter,
+preserves the agent's explicit note and graph proposal, applies a versioned
+external-state update, and tests whether the resulting topology changes
+deterministic retrieval before a separate probe turn consumes the retrieved
+context.
 
 The unit of analysis is the base model plus its external scaffold. This case
 does not expose hidden cognition, estimate a primitive effect, or test
@@ -13,11 +15,11 @@ experience-order effects.
 ## Commands
 
 ```bash
-npm run preflight:thought-space-v0
-npm run demo:thought-space-v0
-npm run run:thought-space-v0
-npm run view:thought-space-v0 -- <run-id>
-npm run test:thought-space-v0
+npm run preflight
+npm run demo
+npm run run
+npm run view -- <run-id>
+npm test
 ```
 
 Real traces and model outputs stay under the ignored `.trace-inspector/`

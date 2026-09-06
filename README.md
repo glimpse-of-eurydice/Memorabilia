@@ -1,4 +1,4 @@
-# Thought Space
+# Memorabilia
 
 ## A question before an architecture
 
@@ -7,7 +7,7 @@ This project began with a more personal question:
 > **What if memory is not something an agent owns, but something it lives
 > with?**
 
-Thought Space does not begin by treating memory as a fixed asset, a growing
+Memorabilia does not begin by treating memory as a fixed asset, a growing
 archive, or a better database of past items. Its working intuition is that
 memory may be closer to a changing **organization pattern**: the way encounters
 become selected, related, stabilized, weakened, and reactivated—and therefore
@@ -43,9 +43,9 @@ Two traditions currently provide the project's main theoretical orientation.
 Modern engram research treats memory traces as physical, distributed, and
 reactivatable. More importantly for this project, it distinguishes merely
 observing a candidate trace from causally testing whether that trace
-participates in later remembering or behavior. This motivates Thought Space's
-progression from trace visualization to retrieval intervention and downstream
-probe.
+participates in later remembering or behavior. This motivates the Thought
+Space observational surface's progression from trace visualization to
+retrieval intervention and downstream probe.
 
 Starting references:
 
@@ -72,7 +72,7 @@ Starting references:
 These sources provide questions, constraints, and experimental intuitions—not
 biological validation. A bubble is not claimed to be an engram, an edge is not
 a synapse, and the visible graph is not claimed to reveal an LLM's hidden
-cognitive structure. Thought Space instead builds an artificial, external,
+cognitive structure. Memorabilia instead builds an artificial, external,
 instrumentable system in which analogous questions about trace, persistence,
 history, and functional use can be tested.
 
@@ -94,14 +94,29 @@ and toward asking:
 > **How does experience become structure, and how does that structure change
 > future activity?**
 
-Thought Space operationalizes this question through an external scaffold. The
+Memorabilia operationalizes this question through an external scaffold. The
 unit under study is the base model plus that scaffold—not the model's hidden
 state in isolation.
 
+## Naming boundary
+
+- **Memorabilia** is the research program and developmental experiment. It asks
+  how a history becomes constitutive of an artificial agent system.
+- **Thought Space** is the graph-based observational surface through which one
+  version of that developing organization is externalized, inspected, and
+  intervened on. It is not identified with the agent's mind.
+- **Trace Inspector** is the runtime evidence layer used to record and replay
+  encounters and probes.
+
+In short: **Memorabilia is the experiment; Thought Space is one way of
+observing it.** This separation keeps the research question intact even if a
+later study finds that graph topology depends strongly on the chosen
+externalization regime.
+
 ## Frozen v0 apparatus
 
-This repository freezes **Thought Space apparatus v0.1.0**. The frozen version
-validates one four-layer loop:
+This repository includes the frozen **Memorabilia apparatus v0.1.0**. Its
+Thought Space surface validates one four-layer loop:
 
 ```text
 Encounter trace

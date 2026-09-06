@@ -1,5 +1,7 @@
 {
   "schemaVersion": "0.1",
+  "projectName": "Memorabilia",
+  "observationalInterface": "Thought Space",
   "apparatusVersion": "0.1.0",
   "frozenAt": "2026-09-06",
   "sourceRepository": "https://github.com/glimpse-of-eurydice/trace-inspector.git",

@@ -1,9 +1,11 @@
-# Frozen apparatus contract: v0.1.0
+# Frozen Memorabilia apparatus contract: v0.1.0
 
 ## Purpose
 
-This version demonstrates that an external thought-space scaffold can be
-configured, observed, replayed, and intervened on in a single-encounter run.
+This version demonstrates that the Thought Space observational scaffold inside
+Memorabilia can be configured, observed, replayed, and intervened on in a
+single-encounter run. Thought Space is an externalized graph interface, not a
+claim about the agent's hidden cognitive state.
 
 ## Frozen substrate
 

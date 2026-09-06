@@ -1,8 +1,8 @@
 {
-  "name": "thought-space",
+  "name": "memorabilia",
   "version": "0.1.0",
   "private": true,
-  "description": "A frozen v0 apparatus for observable, replayable, and intervenable external thought-space experiments.",
+  "description": "An experimental sandbox for history-sensitive artificial development.",
   "type": "module",
   "engines": {
     "node": ">=22"
