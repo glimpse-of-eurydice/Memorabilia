@@ -1,8 +1,104 @@
 # Thought Space
 
-Thought Space is an experimental scaffold for studying how persistent external
-information organization develops across encounters and affects later
-retrieval and interpretation.
+## A question before an architecture
+
+This project began with a more personal question:
+
+> **What if memory is not something an agent owns, but something it lives
+> with?**
+
+Thought Space does not begin by treating memory as a fixed asset, a growing
+archive, or a better database of past items. Its working intuition is that
+memory may be closer to a changing **organization pattern**: the way encounters
+become selected, related, stabilized, weakened, and reactivated—and therefore
+change how later experience is interpreted.
+
+In this framing, a surviving record is not yet the interesting result. An
+encounter becomes consequential when it leaves a persistent, testable
+modification in what the system retrieves, connects, expects, or does next.
+
+```text
+encounters over time
+        ↓
+local traces and relations
+        ↓
+temporary stabilization, decay, and reactivation
+        ↓
+developing organization
+        ↓
+changed response to future encounters
+        ↺
+```
+
+The project may produce machinery that resembles an external-memory
+architecture, but its research object is broader: **development through
+experience**.
+
+## Intellectual starting points
+
+Two traditions currently provide the project's main theoretical orientation.
+
+### Engram research in neuroscience
+
+Modern engram research treats memory traces as physical, distributed, and
+reactivatable. More importantly for this project, it distinguishes merely
+observing a candidate trace from causally testing whether that trace
+participates in later remembering or behavior. This motivates Thought Space's
+progression from trace visualization to retrieval intervention and downstream
+probe.
+
+Starting references:
+
+- Josselyn, Köhler & Frankland (2015),
+  [*Finding the engram*](https://doi.org/10.1038/nrn4000)
+- Josselyn & Tonegawa (2020),
+  [*Memory engrams: Recalling the past and imagining the future*](https://doi.org/10.1126/science.aaw4325)
+
+### Dynamic systems approaches in developmental psychology
+
+Dynamic systems approaches treat development as change emerging through many
+local interactions unfolding over time, rather than as the execution of a
+fully specified internal program. From this perspective, history and timing
+matter: each state constrains what can happen next, and the trajectory itself
+is an object of study rather than noise surrounding a final endpoint.
+
+Starting references:
+
+- Thelen & Smith (1994),
+  [*A Dynamic Systems Approach to the Development of Cognition and Action*](https://mitpress.mit.edu/9780262700597/a-dynamic-systems-approach-to-the-development-of-cognition-and-action/)
+- Smith & Thelen (2003),
+  [*Development as a dynamic system*](https://doi.org/10.1016/S1364-6613(03)00156-6)
+
+These sources provide questions, constraints, and experimental intuitions—not
+biological validation. A bubble is not claimed to be an engram, an edge is not
+a synapse, and the visible graph is not claimed to reveal an LLM's hidden
+cognitive structure. Thought Space instead builds an artificial, external,
+instrumentable system in which analogous questions about trace, persistence,
+history, and functional use can be tested.
+
+## Research direction
+
+The longer-term question is:
+
+> **Can a small set of primitive dynamics, interacting with otherwise
+> identical encounters in different temporal orders, produce divergent,
+> persistent, and behaviorally consequential trajectories of information
+> organization?**
+
+The project therefore moves away from asking only:
+
+> What should an agent store and retrieve?
+
+and toward asking:
+
+> **How does experience become structure, and how does that structure change
+> future activity?**
+
+Thought Space operationalizes this question through an external scaffold. The
+unit under study is the base model plus that scaffold—not the model's hidden
+state in isolation.
+
+## Frozen v0 apparatus
 
 This repository freezes **Thought Space apparatus v0.1.0**. The frozen version
 validates one four-layer loop:
@@ -15,8 +111,9 @@ Encounter trace
 → fresh probe turn
 ```
 
-v0 is apparatus validation. It does not estimate primitive effects, experience
-order effects, hidden model cognition, or human-like memory.
+v0 is apparatus validation. It asks whether the scaffold can be configured,
+observed, replayed, and intervened on. It does not estimate primitive effects,
+experience-order effects, hidden model cognition, or human-like memory.
 
 ## Quick start
 
