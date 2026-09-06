@@ -1,379 +1,293 @@
-# Primitive Specification v1 — Design Worksheet
+# Primitive specification v1 — Layer A worksheet
 
 > **Status:** draft / not frozen
-> **Purpose:** define the fixed three-primitive architecture for the first
-> developmental-history experiment
+> **Scope:** research-design decisions required before v1 encounter design
+> **Apparatus dependency:** Memorabilia v0.1.0
 > **Researcher-only:** this file must never enter a subject workspace.
 
-## How to fill this in
+## How to use this worksheet
 
-Write freely inside each `[YOUR ANSWER]` block. Short answers are enough. If
-you are uncertain, write the alternatives you are considering and why; do not
-choose an arbitrary number just to remove a blank.
+Fill only decisions that define the experimental paradigm. Do not choose a
+number merely to eliminate a blank. Numerical values belong in
+[`runtime-parameters-v1.json`](runtime-parameters-v1.json) and interpretive
+criteria belong in [`preregistration-v1.md`](preregistration-v1.md).
 
-After this worksheet is complete, translate it into the exact equations,
-schemas, provenance fields, tests, and config described in
-[`primitive-spec-v1-reference.md`](primitive-spec-v1-reference.md). The
-worksheet captures research decisions; the reference turns them into an
-implementation contract.
+Valid answers include `undecided`, with a sentence naming what evidence would
+resolve the decision. Layer A must nevertheless be frozen before encounter
+design and implementation begin.
 
-## 1. What should v1 test?
+## 1. Primary research question
 
-Proposed primary question:
+Proposed v1 question:
 
 > Can a fixed minimal set of primitive dynamics, interacting with an identical
 > multiset of encounters presented in different temporal orders, produce
 > divergent, persistent, and behaviorally consequential trajectories of
 > information organization?
 
-Keep, revise, or replace it:
+Keep or revise:
 
 > [YOUR ANSWER]
 
-For v1, the only intended manipulated variable is encounter order. Everything
-else—including the primitive set—is fixed.
+Confirm the v1 manipulation:
 
-Is that the experiment you want to run?
+- manipulated: encounter order;
+- fixed: encounter multiset, primitive architecture, runtime parameter set,
+  model/runtime, prompts, retrieval regime, and probes;
+- observed: graph trajectory and behavior from non-learning probe forks.
 
-> [YOUR ANSWER: yes / revision]
+> [YOUR ANSWER: confirm or revise]
 
-## 2. What counts as one developmental step?
+## 2. One developmental step
 
-A step should be an explicit experimental event, not elapsed wall-clock time.
+Define one step as an experimental event, not elapsed wall-clock time.
 
-Choose one:
+> [YOUR ANSWER: e.g. one accepted encounter followed by one consolidation
+> transition]
 
-- one accepted encounter;
-- one encounter followed by one consolidation step;
-- another definition.
+Does an invalid agent output consume a step or mutate developmental state?
 
-> [YOUR ANSWER]
+> [YOUR ANSWER; recommended: preserve the failed trace, do neither]
 
-Should an invalid encounter output consume a developmental step?
+## 3. Shared state and provenance
 
-> [YOUR ANSWER: recommended no; preserve the failed run without updating state]
+Which state variables exist conceptually? Numerical ranges do not belong here.
 
-## 3. Primitive A — Selection / Activation
+| State | Meaning | Applies to | Required? |
+|---|---|---|---|
+| activation | participation in the current step | node / relation / other | `[YOUR ANSWER]` |
+| association strength | learned relational influence | relation | `[YOUR ANSWER]` |
+| persistence | current functional availability across steps | node / relation | `[YOUR ANSWER]` |
+| enabled/accessibility | eligibility for ordinary traversal | node / relation | `[YOUR ANSWER]` |
 
-Plain-language question:
-
-> When a new encounter arrives, what from the existing organization becomes
-> active with it?
-
-### 3.1 Who proposes activation?
-
-Choose one starting model:
-
-- **Agent-led:** the agent names which existing structures became relevant;
-  the runtime validates the references.
-- **Runtime-led:** a deterministic rule selects structures without asking the
-  agent.
-- **Hybrid:** the runtime creates a candidate set, the agent scores/selects
-  within it, and the runtime applies fixed bounds.
-
-> [YOUR ANSWER]
-
-Why is this the best choice for the first experiment?
-
-> [YOUR ANSWER]
-
-### 3.2 Candidate boundary
-
-What existing structures may be considered?
-
-> [YOUR ANSWER: nodes, edges, clusters, and/or other units]
-
-How is the candidate set generated without secretly deciding relevance for the
-agent?
-
-> [YOUR ANSWER]
-
-Maximum number activated per encounter:
-
-> [YOUR ANSWER: number or “no cap,” with rationale]
-
-If candidates tie, use:
-
-> [YOUR ANSWER: recommended canonical ID order]
-
-### 3.3 Expected observable signature
-
-If Selection / Activation is working, what should we be able to observe in a
-trace or later retrieval?
-
-> [YOUR ANSWER]
-
-## 4. Primitive B — Association
-
-Plain-language question:
-
-> When structures are active together, what becomes connected or stronger?
-
-### 4.1 What can association change?
-
-Should it operate on:
-
-- newly proposed relations;
-- pre-existing relations;
-- both?
-
-> [YOUR ANSWER: recommended both]
-
-Who supplies the semantic relation label for a new edge?
-
-> [YOUR ANSWER: recommended agent proposes; runtime never invents meaning]
-
-### 4.2 Strengthening rule
-
-Provisional rule:
+Required provenance should distinguish at minimum:
 
 ```text
-if both endpoints are active and the relation is eligible:
-    new weight = min(max weight, old weight + increment)
+model proposed
+runtime accepted or rejected
+primitive modified
+final state
 ```
 
-Association increment:
-
-> [YOUR ANSWER: v0 used 0.25]
-
-Maximum relation weight:
+Add or revise required provenance fields:
 
 > [YOUR ANSWER]
 
-Should partial/numeric activation produce partial strengthening, or should v1
-use a Boolean active/inactive rule?
+## 4. Primitive contract: Selection / Activation
+
+**Question:** What from existing organization participates in the current
+encounter?
+
+**Inputs:**
+
+> [YOUR ANSWER: encounter fields, pre-state fields, eligible units]
+
+**Output:**
+
+> [YOUR ANSWER: the conceptual shape of an activation decision]
+
+Who proposes and who decides?
+
+- agent-led;
+- runtime-led;
+- hybrid: runtime bounds candidates and the agent selects within them;
+- another explicitly described policy.
 
 > [YOUR ANSWER]
 
-### 4.3 Expected observable signature
-
-After repeated coactivation, what should differ from a matched relation that
-was not repeatedly coactivated?
+How is the candidate boundary created without covertly deciding relevance?
 
 > [YOUR ANSWER]
 
-## 5. Primitive C — Persistence / Decay / Reactivation
-
-Plain-language question:
-
-> What survives, what weakens when inactive, and what can return when cued?
-
-### 5.1 What persists?
-
-Should nodes and relations each have their own persistence value?
-
-> [YOUR ANSWER: recommended yes]
-
-Should relation weight and persistence remain separate variables?
-
-> [YOUR ANSWER: recommended yes—strength and availability are different]
-
-Initial persistence of a newly accepted structure:
-
-> [YOUR ANSWER: v0 used 1.0]
-
-### 5.2 Decay
-
-Provisional rule:
-
-```text
-if a pre-existing structure was not activated during this step:
-    new persistence = old persistence × (1 - decay rate)
-```
-
-Decay rate per developmental step:
-
-> [YOUR ANSWER: v0 used 0.05]
-
-What happens below the persistence threshold?
-
-- retained but normally inaccessible;
-- disabled but reactivatable;
-- permanently removed;
-- another policy.
-
-> [YOUR ANSWER: avoid permanent deletion in v1 if possible]
-
-Threshold:
+What trace evidence must this primitive emit?
 
 > [YOUR ANSWER]
 
-### 5.3 Reactivation
+Non-goal or forbidden interpretation:
 
-What kind of cue is sufficient to reactivate a weakened structure?
+> [YOUR ANSWER; must include that this is not transformer attention]
+
+## 5. Primitive contract: Association
+
+**Question:** When structures participate together, what becomes related or
+stronger?
+
+**Inputs:**
+
+> [YOUR ANSWER: active-set and accepted-relation inputs]
+
+**Output:**
+
+> [YOUR ANSWER: new relation, changed association strength, or both]
+
+May it operate on new relations, existing relations, or both?
 
 > [YOUR ANSWER]
 
-How much persistence is restored?
+Who authors a relation's semantic label, and what may the runtime do?
 
-> [YOUR ANSWER: fixed increment, proportional recovery, or reset]
+> [YOUR ANSWER; recommended boundary: agent proposes meaning, runtime validates
+> and applies mechanics]
 
-Does reactivation restore accessibility only, or also strengthen association?
-
-> [YOUR ANSWER]
-
-### 5.4 Expected observable signature
-
-What difference should exist between an inactive structure, a partially cued
-structure, and a repeatedly reactivated structure?
+What trace evidence must this primitive emit?
 
 > [YOUR ANSWER]
 
-## 6. How can existing organization change?
+Non-goal or forbidden interpretation:
 
-v0 can mainly add nodes and edges. v1 must decide what happens when a later
-encounter qualifies or conflicts with an existing relation.
+> [YOUR ANSWER; must distinguish coactivation from semantic truth]
 
-Which operations should an agent be allowed to propose?
+## 6. Primitive contract: Persistence / Decay / Reactivation
 
-- revise a node summary;
-- revise a relation;
-- add a qualifier;
-- supersede an old relation while preserving it in provenance;
-- disable a relation;
+**Question:** What remains functionally available, what weakens through
+inactivity, and what can return when cued?
+
+**Inputs:**
+
+> [YOUR ANSWER: active set, pre-existing state, cue eligibility]
+
+**Output:**
+
+> [YOUR ANSWER: persistence and/or accessibility transitions]
+
+Define the distinct roles of persistence, decay, and reactivation:
+
+> [YOUR ANSWER]
+
+Should node and relation persistence be represented separately? Should
+association strength and persistence remain distinct?
+
+> [YOUR ANSWER]
+
+What does crossing a low-persistence boundary mean conceptually: retained but
+normally inaccessible, disabled but reactivatable, permanently removed, or
+another policy?
+
+> [YOUR ANSWER]
+
+What kind of event is eligible to reactivate a weakened structure?
+
+> [YOUR ANSWER]
+
+What trace evidence must this primitive emit?
+
+> [YOUR ANSWER]
+
+Non-goal or forbidden interpretation:
+
+> [YOUR ANSWER; recommended: no irreversible provenance loss]
+
+## 7. Graph revision policy
+
+Later encounters must be able to reorganize prior structure rather than only
+append to it. Select the permitted semantic operations:
+
+- qualify an existing claim or relation;
+- revise a node or relation while preserving its prior version;
+- supersede without erasing;
+- disable while retaining provenance;
+- merge or split representational units;
 - another operation.
 
 > [YOUR ANSWER]
 
-Give one concrete example of how competing information should change the graph:
+Give one example of how competing evidence changes the graph:
 
 > [YOUR ANSWER]
 
-What must never be erased from provenance?
+What information must never be erased?
 
 > [YOUR ANSWER]
 
-## 7. Execution order
+## 8. Primitive execution order
 
-Proposed order for each encounter:
+Proposed conceptual order:
 
 ```text
-1. Load pre-encounter snapshot
-2. Present encounter and permitted retrieved context
-3. Generate activation candidates
-4. Record agent-proposed activation and graph changes
-5. Validate without repairing invalid output
-6. Resolve the final active set
-7. Decay pre-existing inactive structures
-8. Reactivate eligible weakened active structures
-9. Apply accepted additions/revisions
-10. Strengthen eligible co-activated relations
-11. Save agent-authored and primitive-generated deltas separately
-12. Create and hash the immutable next snapshot
-13. Run probes as non-learning forks
+1. Load the immutable pre-encounter snapshot.
+2. Present the encounter and permitted retrieved context.
+3. Record model-proposed activation and graph revision.
+4. Validate proposals without semantic repair.
+5. Resolve the accepted active set.
+6. Apply inactivity-dependent decay to pre-existing structure.
+7. Apply eligible reactivation.
+8. Apply accepted additions and revisions.
+9. Apply association to eligible co-active structure.
+10. Save model-authored and primitive-generated deltas separately.
+11. Hash the immutable next snapshot.
+12. Fork probes from the snapshot without learning from them.
 ```
 
-Accept this order or describe the change you want:
+Accept or revise:
 
 > [YOUR ANSWER]
 
-If two primitives modify the same value, which one takes precedence?
+If primitive operations target the same state variable, define conceptual
+precedence (not numeric magnitude):
 
 > [YOUR ANSWER]
 
-## 8. What must the encounters make possible?
+## 9. Encounter requirements
 
-Fill in a provisional encounter ID or idea for each function. The final order
-conditions must use the same checksummed material multiset.
+The final order conditions must use the same checksummed material multiset.
+Specify what the multiset must make possible; do not write the encounters yet.
 
-| Function | Why it is needed | Encounter idea or ID |
-|---|---|---|
-| Initial relation formation | Creates something that can later develop | `[YOUR ANSWER]` |
-| Repeated coactivation | Allows existing-edge association | `[YOUR ANSWER]` |
-| Competing/qualifying information | Allows revision rather than accumulation | `[YOUR ANSWER]` |
-| Inactive interval | Gives decay an opportunity | `[YOUR ANSWER]` |
-| Partial cue | Tests selection and reactivation | `[YOUR ANSWER]` |
-| Novel transfer | Tests organization-in-use | `[YOUR ANSWER]` |
+| Functional requirement | Required encounter property |
+|---|---|
+| Initial relation formation | `[YOUR ANSWER]` |
+| Repeated coactivation | `[YOUR ANSWER]` |
+| Competing or qualifying information | `[YOUR ANSWER]` |
+| Inactive interval | `[YOUR ANSWER]` |
+| Partial cue and reactivation opportunity | `[YOUR ANSWER]` |
+| Novel transfer probe | `[YOUR ANSWER]` |
 
-What should both order conditions see immediately before the final probe, so
-that the result is not merely “whatever came last”?
-
-> [YOUR ANSWER]
-
-## 9. Behavioral measurement
-
-Probes must fork from a snapshot and must not update the developmental graph.
-
-Which checkpoints should receive probes?
-
-> [YOUR ANSWER: every encounter or selected checkpoints]
-
-Minimal calibration conditions:
-
-- no graph context;
-- intact graph context;
-- registered knockout context;
-- reinstated context.
-
-What behavior should change if Thought Space is functionally consequential?
+What must be balanced immediately before final probes so that an order effect
+cannot be reduced to recency?
 
 > [YOUR ANSWER]
 
-What behavior should remain invariant?
+What semantic constraints prevent one ordering from being inherently more
+coherent, informative, or difficult?
 
 > [YOUR ANSWER]
 
-## 10. Results declared in advance
+## 10. Behavioral-probe contract
 
-Complete these before the main experiment.
+Probes fork from a registered snapshot and cannot update developmental state.
 
-### Evidence consistent with a history effect
-
-> [YOUR ANSWER: specify trajectory and behavioral criteria without requiring a
-> preferred direction]
-
-### Meaningful null result
+At which developmental checkpoints are probes required?
 
 > [YOUR ANSWER]
 
-### Apparatus failure rather than a scientific null
-
-> [YOUR ANSWER: include “a primitive never received an eligible input” and
-> “different graph contexts cannot affect the calibration probe”]
-
-### Result that would weaken the Thought Space measurement regime
-
-> [YOUR ANSWER: for example, graph differences do not predict downstream
-> behavior]
-
-## 11. Future ablations — registered, not run in v1
-
-| Condition | Selection | Association | Persistence family |
-|---|---:|---:|---:|
-| `P_all` | on | on | on |
-| `P_no_selection` | off | on | on |
-| `P_no_association` | on | off | on |
-| `P_no_persistence` | on | on | off |
-| `P_base` | off | off | off |
-
-`P_base` still includes schema, storage, snapshots, serialization, retrieval,
-and trace collection. It is not a representation-free agent.
-
-Do you want to change or add any future condition?
+Which probe inputs are held identical across order conditions?
 
 > [YOUR ANSWER]
 
-## 12. Ready-to-formalize checklist
+What runtime evidence proves the probe received the intended graph-derived
+context and remained non-learning?
 
-- [ ] The primary v1 question is correct.
+> [YOUR ANSWER]
+
+Do not define evidence for a history effect here; that is Layer C.
+
+## 11. Layer A freeze record
+
+- [ ] The primary question and sole v1 manipulation are fixed.
 - [ ] One developmental step is defined.
-- [ ] Activation proposer and candidate boundary are chosen.
-- [ ] Association can strengthen existing edges.
-- [ ] Association increment and upper bound are chosen.
-- [ ] Persistence, decay, threshold, and reactivation are defined separately.
-- [ ] Competing information can revise organization without erasing history.
-- [ ] Primitive execution order is accepted.
-- [ ] Every primitive has at least one eligible encounter.
-- [ ] Probe checkpoints and non-learning isolation are defined.
-- [ ] Supporting, null, and apparatus-failure outcomes are stated.
-- [ ] Unresolved choices are explicitly marked rather than guessed.
-
-## 13. Worksheet record
+- [ ] Each primitive has explicit inputs, outputs, ownership, provenance, and
+      a non-goal.
+- [ ] Graph revision can change organization without erasing history.
+- [ ] Primitive execution order and conflict precedence are fixed.
+- [ ] Encounter functional requirements and recency controls are fixed.
+- [ ] Behavioral probes are non-learning and their checkpoints are fixed.
+- [ ] Numerical choices have been removed to Layer B.
+- [ ] Interpretive outcome criteria have been removed to Layer C.
+- [ ] Remaining unknowns are named rather than guessed.
 
 | Field | Value |
 |---|---|
-| Worksheet version | `1.0-draft` |
+| Spec version | `1.0-draft` |
 | Author | `[YOUR ANSWER]` |
-| Date completed | `[YOUR ANSWER]` |
+| Frozen on | `undecided` |
+| Frozen commit | `undecided` |
 | Apparatus dependency | `Memorabilia v0.1.0` |
-| Notes | `[YOUR ANSWER]` |

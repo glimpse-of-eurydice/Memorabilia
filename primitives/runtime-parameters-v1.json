@@ -1,0 +1,8 @@
+{
+  "associationIncrement": 0.25,
+  "maximumEdgeWeight": null,
+  "decayRatePerStep": 0.05,
+  "persistenceThreshold": null,
+  "reactivationIncrement": null,
+  "activationCap": null
+}

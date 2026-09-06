@@ -156,10 +156,13 @@ are not copied into its temporary workspace.
 
 ## Repository map
 
-- `primitives/primitive-spec-v1.md`: short design worksheet for the next fixed
-  developmental architecture
-- `primitives/primitive-spec-v1-reference.md`: formal mechanism,
-  preregistration, and implementation checklist
+- `primitives/`: staged primitive-design documents that freeze concepts before
+  parameters
+  - `README.md`: Layer A/B/C lifecycle and current research sequence
+  - `primitive-philosophy.md`: conceptual rationale and claim boundary
+  - `primitive-spec-v1.md`: Layer A research-design worksheet
+  - `runtime-parameters-v1.json`: Layer B pilot-dependent numerical settings
+  - `preregistration-v1.md`: Layer C holding document, gated on v0.5
 - `case-studies/thought-space-v0/`: claim boundary and standalone UI assets
 - `fixtures/case-studies/thought-space-v0/`: frozen config, encounter, subject
   task, and credential-free synthetic inputs
