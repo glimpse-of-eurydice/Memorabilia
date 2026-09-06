@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "0.1",
+  "caseStudyId": "thought-space-v0",
+  "runId": "S001-demo",
+  "blindId": "S001",
+  "status": "completed",
+  "startedAt": "2026-09-04T00:00:00.000Z",
+  "endedAt": "2026-09-04T00:00:01.000Z",
+  "configHash": "ba81e734f20a04d6948397a61b1fedf8aaa9ad78a7eabe9f22c254afb97dacff",
+  "encounterHash": "314d6466b4bc469d21e10e5e97e30ae9688c3e0cf93d3ea3897eab0d7a350571",
+  "taskHash": "e7c821545f39751e55af9cab8b0a26b9b8a1933b252633e1243ac7759bfca944",
+  "probeTaskHash": "234acac6a0334642301186d40c4a2b652447d445fd9196acdd4a8cab942799b7",
+  "preSnapshotHash": "80b847155b48d86fa5333ccf9be5a1c22a5995ad3e4934313c47ea065d1cbe74",
+  "encounterTrace": null,
+  "probeTrace": null,
+  "snapshotHash": "13b5a446580546d9872d962ec0354e79237d1e1dcb99192646c77ec760f62abc",
+  "leakageStatus": "no_leakage_observed",
+  "noSilentRetry": true,
+  "claimBoundary": "Credential-free synthetic apparatus demo; no live-runtime or causal claim."
+}

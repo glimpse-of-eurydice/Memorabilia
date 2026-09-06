@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+# Real traces, agent outputs, temporary subject workspaces, and run ledgers.
+.trace-inspector/
+
+*.log
+tmp/
+temp/
+.work/
+.DS_Store
+.idea/
+.vscode/

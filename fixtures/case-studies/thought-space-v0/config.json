@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "0.1",
+  "caseStudyId": "thought-space-v0",
+  "blindId": "S001",
+  "runtime": {
+    "model": "gpt-5.6-sol",
+    "reasoningEffort": "medium",
+    "timeoutMs": 180000,
+    "networkAccess": false,
+    "approvalPolicy": "never"
+  },
+  "environment": {
+    "name": "quiet-study",
+    "affordances": ["research-notebook", "concept-map"]
+  },
+  "schedule": {
+    "maxEncounters": 1,
+    "researchTurns": 1,
+    "externalizationTurns": 1,
+    "consolidationSteps": 1
+  },
+  "primitiveSeed": {
+    "id": "association-decay-v0",
+    "association": { "enabled": true, "increment": 0.25 },
+    "decay": { "enabled": true, "rate": 0.05 }
+  },
+  "retrieval": {
+    "maxHops": 2,
+    "topK": 5,
+    "contextTokenBudget": 1200
+  },
+  "encounterManifest": "fixtures/case-studies/thought-space-v0/encounter.json"
+}

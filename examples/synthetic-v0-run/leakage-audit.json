@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "0.1",
+  "status": "no_leakage_observed",
+  "runtimeChecks": [],
+  "boundaryFindings": [],
+  "subjectFiles": [
+    "concept-map.json",
+    "encounter.md",
+    "graph-patch.json",
+    "research-note.md",
+    "task.md"
+  ],
+  "claimBoundary": "Synthetic fixture only; no live runtime or operating-system isolation claim."
+}
