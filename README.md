@@ -156,6 +156,10 @@ are not copied into its temporary workspace.
 
 ## Repository map
 
+- `primitives/primitive-spec-v1.md`: short design worksheet for the next fixed
+  developmental architecture
+- `primitives/primitive-spec-v1-reference.md`: formal mechanism,
+  preregistration, and implementation checklist
 - `case-studies/thought-space-v0/`: claim boundary and standalone UI assets
 - `fixtures/case-studies/thought-space-v0/`: frozen config, encounter, subject
   task, and credential-free synthetic inputs
