@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thought Space v0</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">THOUGHT SPACE · APPARATUS V0</p>
+        <h1>One encounter, four evidence layers</h1>
+        <p id="claimBoundary" class="claim"></p>
+      </div>
+      <div id="runBadge" class="run-badge"></div>
+    </header>
+
+    <main>
+      <section class="metrics" id="metrics"></section>
+
+      <section class="workspace-grid">
+        <article class="panel graph-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">DEVELOPED THOUGHT SPACE</p>
+              <h2>Agent-authored organization</h2>
+            </div>
+            <label>Retrieval view
+              <select id="retrievalMode"></select>
+            </label>
+          </div>
+          <svg id="graph" viewBox="0 0 900 560" role="img" aria-label="Thought Space graph"></svg>
+          <div id="nodeDetail" class="node-detail">Select a bubble to inspect its provenance.</div>
+          <div class="legend">
+            <span><i class="dot cooling"></i> cooling</span>
+            <span><i class="dot outcomes"></i> outcomes</span>
+            <span><i class="dot constraints"></i> constraints</span>
+            <span><i class="line traversed"></i> traversed</span>
+            <span><i class="line knocked"></i> knocked out</span>
+          </div>
+        </article>
+
+        <aside class="stack">
+          <article class="panel">
+            <p class="eyebrow">LAYER 1</p>
+            <h2>Encounter</h2>
+            <div id="encounter" class="prose"></div>
+            <div id="traceLinks" class="trace-links"></div>
+          </article>
+          <article class="panel">
+            <p class="eyebrow">LAYER 2</p>
+            <h2>Externalization</h2>
+            <div id="researchNote" class="prose"></div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="lower-grid">
+        <article class="panel">
+          <p class="eyebrow">LAYER 3</p>
+          <h2>State transition</h2>
+          <div id="stateDelta"></div>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">LAYER 4</p>
+          <h2>Organization in use</h2>
+          <div id="retrievalDetail"></div>
+          <h3>Probe response</h3>
+          <div id="response" class="prose"></div>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">AUDIT</p>
+          <h2>Leakage boundary</h2>
+          <div id="leakage"></div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "valid": true,
+  "errors": [],
+  "acceptedOperationLocalIds": [
+    "shade",
+    "heat-exposure",
+    "water-availability",
+    "shade-reduces-exposure",
+    "water-qualifies-cooling"
+  ],
+  "rejectedOperations": []
+}

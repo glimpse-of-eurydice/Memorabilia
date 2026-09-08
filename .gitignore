@@ -1,11 +1,25 @@
-.trace-inspector/
-**/local-materials/
 node_modules/
+dist/
+coverage/
+*.tsbuildinfo
 
-# Local experiment archives, scratch files, and secrets
-*.zip
-work/
-.DS_Store
 .env
 .env.*
+!.env.example
+
+# Real traces, agent outputs, temporary subject workspaces, and run ledgers.
+.trace-inspector/
+
+*.log
+tmp/
+temp/
+.work/
+.DS_Store
+.idea/
+.vscode/
+
+# Additional local pilot artifacts
+**/local-materials/
+*.zip
+work/
 __pycache__/

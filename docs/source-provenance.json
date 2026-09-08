@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "0.1",
+  "projectName": "Memorabilia",
+  "observationalInterface": "Thought Space",
+  "apparatusVersion": "0.1.0",
+  "frozenAt": "2026-09-06",
+  "sourceRepository": "https://github.com/glimpse-of-eurydice/trace-inspector.git",
+  "sourceBaseCommit": "18eea88a72f37585aabd9c82095968ae600c32cd",
+  "sourceOverlay": [
+    "isolated Thought Space v0 case-study source, fixtures, and UI",
+    "complete-message aggregation for normalized model-reported events",
+    "orchestration failure preservation and no-silent-retry tests"
+  ],
+  "vendoredTraceInspectorSurface": [
+    "Codex app-server collector",
+    "Codex raw-message adapter and normalizer",
+    "event/span reconstruction and diagnostics",
+    "trace file store, replay, and timeline server/UI"
+  ],
+  "realRunDataIncluded": false,
+  "unrelatedDirtySourceFilesIncluded": false
+}

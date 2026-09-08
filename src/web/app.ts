@@ -1,0 +1,712 @@
+import type { TraceEvent, TraceEventKind } from "../core/trace-event.js";
+import type { RawTraceRecord } from "../adapters/codex/raw-codex-message.js";
+import type { DiagnosticFinding } from "../core/diagnostic-finding.js";
+import type { TraceSpan } from "../core/trace-span.js";
+
+interface TraceManifest {
+  traceId: string;
+  source: string;
+  status: string;
+  startedAt: string;
+  endedAt: string;
+  eventCount: number;
+  codexVersion: string;
+}
+
+interface TracePayload {
+  manifest: TraceManifest;
+  events: TraceEvent[];
+  spans: TraceSpan[];
+  findings: DiagnosticFinding[];
+  rawRecords: RawTraceRecord[];
+  securityCase: SecurityCasePayload | null;
+}
+
+interface SecurityCaseStage {
+  id: string;
+  label: string;
+  state: "reached" | "absent" | "dormant" | "utility";
+  evidenceLevel: "observed" | "model_reported" | "inferred";
+  detail: string;
+  evidenceEventIds: string[];
+}
+
+interface SecurityCasePayload {
+  caseStudyId: string;
+  runId: string;
+  title: string;
+  verdict: string;
+  condition: string;
+  runtimeBoundary: string;
+  claimBoundary: string;
+  stages: SecurityCaseStage[];
+}
+
+type LaneId =
+  | "lifecycle"
+  | "messages"
+  | "plan"
+  | "commands"
+  | "files"
+  | "system";
+
+const laneDefinitions: Array<{
+  id: LaneId;
+  label: string;
+  description: string;
+}> = [
+  { id: "lifecycle", label: "Lifecycle", description: "RPC · thread · turn" },
+  { id: "messages", label: "Messages", description: "user · agent output" },
+  { id: "plan", label: "Plan", description: "planning updates" },
+  { id: "commands", label: "Commands", description: "tool execution" },
+  { id: "files", label: "Files", description: "changes · diffs" },
+  { id: "system", label: "System", description: "usage · unmapped" },
+];
+
+let selectedLane: LaneId | "all" = "all";
+let loadedPayload: TracePayload | undefined;
+
+function requireElement<T extends HTMLElement>(id: string): T {
+  const element = document.getElementById(id);
+
+  if (element === null) {
+    throw new Error(`Missing element #${id}`);
+  }
+
+  return element as T;
+}
+
+function laneFor(kind: TraceEventKind): LaneId {
+  if (
+    kind.startsWith("rpc.") ||
+    kind.startsWith("thread.") ||
+    kind.startsWith("turn.")
+  ) {
+    return "lifecycle";
+  }
+
+  if (kind.startsWith("message.")) {
+    return "messages";
+  }
+
+  if (kind.startsWith("plan.")) {
+    return "plan";
+  }
+
+  if (kind.startsWith("command.")) {
+    return "commands";
+  }
+
+  if (kind.startsWith("file.")) {
+    return "files";
+  }
+
+  return "system";
+}
+
+function formatClock(isoTime: string): string {
+  const date = new Date(isoTime);
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+    hour12: false,
+  });
+}
+
+function formatDuration(milliseconds: number): string {
+  if (milliseconds < 1_000) {
+    return `${Math.max(0, Math.round(milliseconds))} ms`;
+  }
+
+  return `${(milliseconds / 1_000).toFixed(2)} s`;
+}
+
+function setText(id: string, value: string): void {
+  requireElement(id).textContent = value;
+}
+
+function createMetadataRow(label: string, value: string): HTMLElement {
+  const row = document.createElement("div");
+  row.className = "metadata-row";
+  const labelElement = document.createElement("dt");
+  labelElement.textContent = label;
+  const valueElement = document.createElement("dd");
+  valueElement.textContent = value;
+  row.append(labelElement, valueElement);
+  return row;
+}
+
+function evidenceDescription(level: TraceEvent["evidenceLevel"]): string {
+  switch (level) {
+    case "observed":
+      return "Recorded at the runtime boundary.";
+    case "model_reported":
+      return "Content emitted by the model and observed by the runtime.";
+    case "inferred":
+      return "Derived by an analysis rule; inspect supporting evidence.";
+  }
+}
+
+function eventStatusClass(event: TraceEvent): string {
+  if (event.status !== undefined) {
+    return `status-${event.status}`;
+  }
+
+  return event.kind === "unknown" ? "status-unmapped" : "status-neutral";
+}
+
+function createFlowBoundary(
+  label: string,
+  title: string,
+  symbol: string,
+  isEnd = false,
+): HTMLElement {
+  const boundary = document.createElement("div");
+  boundary.className = isEnd
+    ? "flow-boundary flow-boundary-end"
+    : "flow-boundary";
+  const labelElement = document.createElement("span");
+  labelElement.textContent = label;
+  const titleElement = document.createElement("strong");
+  titleElement.textContent = title;
+  const symbolElement = document.createElement("i");
+  symbolElement.setAttribute("aria-hidden", "true");
+  symbolElement.textContent = symbol;
+  boundary.append(labelElement, titleElement, symbolElement);
+  return boundary;
+}
+
+function renderDetail(
+  event: TraceEvent,
+  rawRecord: RawTraceRecord | undefined,
+): void {
+  const empty = requireElement("detailEmpty");
+  const content = requireElement("detailContent");
+  empty.hidden = true;
+  content.hidden = false;
+
+  setText("detailSequence", `EVENT ${String(event.sequence).padStart(2, "0")}`);
+  setText("detailTitle", event.title);
+  setText("detailEvidence", event.evidenceLevel.replace("_", " "));
+  setText("detailEvidenceNote", evidenceDescription(event.evidenceLevel));
+
+  const badge = requireElement("detailEvidence");
+  badge.className = `evidence-badge evidence-${event.evidenceLevel}`;
+
+  const metadata = requireElement<HTMLDListElement>("detailMetadata");
+  metadata.replaceChildren(
+    createMetadataRow("Kind", event.kind),
+    createMetadataRow("Status", event.status ?? "not reported"),
+    createMetadataRow("Occurred", formatClock(event.occurredAt)),
+    createMetadataRow("Source event", event.sourceEventType),
+    createMetadataRow("Event ID", event.eventId),
+    createMetadataRow("Entity ID", event.entityId ?? "not reported"),
+    createMetadataRow(
+      "Raw reference",
+      `${event.rawRef.file} · sequence ${event.rawRef.sequence}`,
+    ),
+  );
+
+  setText("normalizedJson", JSON.stringify(event, null, 2));
+  setText(
+    "rawJson",
+    rawRecord === undefined
+      ? "Raw record not found."
+      : JSON.stringify(rawRecord.payload, null, 2),
+  );
+}
+
+function renderSummary(payload: TracePayload): void {
+  const startedAt = new Date(payload.manifest.startedAt).getTime();
+  const endedAt = new Date(payload.manifest.endedAt).getTime();
+  const duration = Math.max(0, endedAt - startedAt);
+  const unmappedCount = payload.events.filter(
+    (event) => event.kind === "unknown",
+  ).length;
+  const modelReportedCount = payload.events.filter(
+    (event) => event.evidenceLevel === "model_reported",
+  ).length;
+
+  setText("traceId", payload.manifest.traceId);
+  setText("traceStatus", payload.manifest.status);
+  setText("eventCount", String(payload.events.length));
+  setText("spanCount", String(payload.spans.length));
+  setText("findingCount", String(payload.findings.length));
+  setText("duration", formatDuration(duration));
+  setText("unmappedCount", String(unmappedCount));
+  setText("modelReportedCount", String(modelReportedCount));
+  setText("runtimeVersion", payload.manifest.codexVersion);
+
+  const status = requireElement("traceStatus");
+  status.className = `status-pill status-${payload.manifest.status}`;
+}
+
+function updateCategorySelection(): void {
+  document
+    .querySelectorAll<HTMLButtonElement>(".event-category")
+    .forEach((button) => {
+      const isSelected = button.dataset.lane === selectedLane;
+      button.classList.toggle("selected", isSelected);
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+}
+
+function renderEventCategories(payload: TracePayload): void {
+  const strip = requireElement("eventCategoryStrip");
+  const counts = new Map<LaneId, number>(
+    laneDefinitions.map((lane) => [lane.id, 0]),
+  );
+
+  for (const event of payload.events) {
+    const lane = laneFor(event.kind);
+    counts.set(lane, (counts.get(lane) ?? 0) + 1);
+  }
+
+  const categories: Array<{
+    id: LaneId | "all";
+    label: string;
+    description: string;
+    count: number;
+  }> = [
+    {
+      id: "all",
+      label: "All events",
+      description: "complete trajectory",
+      count: payload.events.length,
+    },
+    ...laneDefinitions.map((lane) => ({
+      ...lane,
+      count: counts.get(lane.id) ?? 0,
+    })),
+  ];
+
+  strip.replaceChildren();
+
+  for (const category of categories) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "event-category";
+    button.dataset.lane = category.id;
+
+    const count = document.createElement("strong");
+    count.textContent = String(category.count);
+    const copy = document.createElement("span");
+    const label = document.createElement("b");
+    label.textContent = category.label;
+    const description = document.createElement("small");
+    description.textContent = category.description;
+    copy.append(label, description);
+    button.append(count, copy);
+    button.addEventListener("click", () => {
+      selectedLane = category.id;
+      updateCategorySelection();
+      renderTimeline(payload);
+    });
+    strip.append(button);
+  }
+
+  updateCategorySelection();
+}
+
+function renderTimeline(payload: TracePayload): void {
+  const viewport = requireElement("timelineViewport");
+  const showUnmapped =
+    requireElement<HTMLInputElement>("showUnmapped").checked;
+  const visibilityFilteredEvents = showUnmapped
+    ? payload.events
+    : payload.events.filter((event) => event.kind !== "unknown");
+  const events =
+    selectedLane === "all"
+      ? visibilityFilteredEvents
+      : visibilityFilteredEvents.filter(
+          (event) => laneFor(event.kind) === selectedLane,
+        );
+
+  viewport.replaceChildren();
+
+  if (events.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "timeline-empty";
+    empty.textContent = "No events match the current filters.";
+    viewport.append(empty);
+    return;
+  }
+
+  const rawBySequence = new Map(
+    payload.rawRecords.map((record) => [record.sequence, record]),
+  );
+  const flow = document.createElement("div");
+  flow.className = "flow-list";
+
+  flow.append(createFlowBoundary("START", "Runtime connection opened", "↓"));
+
+  for (const [index, event] of events.entries()) {
+    const previousEvent = events[index - 1];
+
+    if (previousEvent !== undefined) {
+      const gap = document.createElement("div");
+      gap.className = "flow-gap";
+      const gapTime =
+        new Date(event.occurredAt).getTime() -
+        new Date(previousEvent.occurredAt).getTime();
+      const spacer = document.createElement("span");
+      const arrow = document.createElement("span");
+      arrow.className = "flow-arrow";
+      arrow.setAttribute("aria-hidden", "true");
+      arrow.textContent = "↓";
+      const delta = document.createElement("span");
+      delta.className = "flow-delta";
+      delta.textContent = `+${formatDuration(Math.max(0, gapTime))}`;
+      gap.append(spacer, arrow, delta);
+      flow.append(gap);
+    }
+
+    const laneId = laneFor(event.kind);
+    const lane = laneDefinitions.find(
+      (definition) => definition.id === laneId,
+    );
+    const row = document.createElement("article");
+    row.className = "flow-event";
+    row.dataset.lane = laneId;
+
+    const clock = document.createElement("time");
+    clock.className = "flow-clock";
+    clock.dateTime = event.occurredAt;
+    clock.textContent = formatClock(event.occurredAt);
+
+    const node = document.createElement("span");
+    node.className = `flow-node ${eventStatusClass(event)}`;
+    node.textContent = String(event.sequence);
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "event-card";
+    card.dataset.eventId = event.eventId;
+    card.setAttribute("aria-label", `Inspect event ${event.sequence}`);
+
+    const cardHeader = document.createElement("span");
+    cardHeader.className = "event-card-header";
+
+    const laneBadge = document.createElement("span");
+    laneBadge.className = `lane-badge lane-${laneId}`;
+    laneBadge.textContent = lane?.label ?? laneId;
+
+    const evidenceBadge = document.createElement("span");
+    evidenceBadge.className = `event-evidence evidence-${event.evidenceLevel}`;
+    evidenceBadge.textContent = event.evidenceLevel.replace("_", " ");
+
+    const status = document.createElement("span");
+    status.className = "event-status";
+    status.textContent =
+      event.status ?? (event.kind === "unknown" ? "unmapped" : "observed");
+    cardHeader.append(laneBadge, evidenceBadge, status);
+
+    const title = document.createElement("strong");
+    title.className = "event-card-title";
+    title.textContent = event.title.replace("Unsupported event:", "Unmapped event:");
+
+    const source = document.createElement("span");
+    source.className = "event-source";
+    source.textContent = event.sourceEventType;
+
+    card.append(cardHeader, title, source);
+    card.addEventListener("click", () => {
+      document
+        .querySelectorAll(".event-card.evidence-linked")
+        .forEach((element) => element.classList.remove("evidence-linked"));
+      document
+        .querySelectorAll(".event-card.selected")
+        .forEach((element) => element.classList.remove("selected"));
+      card.classList.add("selected");
+      renderDetail(event, rawBySequence.get(event.rawRef.sequence));
+    });
+
+    row.append(clock, node, card);
+    flow.append(row);
+  }
+
+  const endStatus = payload.manifest.status.toUpperCase();
+  flow.append(
+    createFlowBoundary(
+      "END",
+      `Turn ${endStatus.toLowerCase()}`,
+      "●",
+      true,
+    ),
+  );
+  viewport.append(flow);
+
+  const firstEvent = events[0];
+
+  if (firstEvent !== undefined) {
+    viewport
+      .querySelector<HTMLButtonElement>(".event-card")
+      ?.classList.add("selected");
+    renderDetail(firstEvent, rawBySequence.get(firstEvent.rawRef.sequence));
+  }
+}
+
+function eventCardFor(eventId: string): HTMLButtonElement | undefined {
+  return [...document.querySelectorAll<HTMLButtonElement>(".event-card")].find(
+    (card) => card.dataset.eventId === eventId,
+  );
+}
+
+function jumpToEvidence(
+  finding: DiagnosticFinding,
+  preferredEventId?: string,
+): void {
+  jumpToEventIds(finding.evidenceEventIds, preferredEventId);
+}
+
+function jumpToEventIds(
+  eventIds: string[],
+  preferredEventId?: string,
+): void {
+  const cards = eventIds
+    .map((eventId) => eventCardFor(eventId))
+    .filter((card): card is HTMLButtonElement => card !== undefined);
+  const preferredCard =
+    preferredEventId === undefined
+      ? undefined
+      : cards.find((card) => card.dataset.eventId === preferredEventId);
+  const targetCard = preferredCard ?? cards[0];
+
+  if (targetCard === undefined) {
+    if (loadedPayload === undefined) {
+      return;
+    }
+
+    const targetIncludesUnmapped = loadedPayload.events.some(
+      (event) => eventIds.includes(event.eventId) && event.kind === "unknown",
+    );
+    const showUnmapped = requireElement<HTMLInputElement>("showUnmapped");
+    const needsLaneReset = selectedLane !== "all";
+    const needsUnmappedReset = targetIncludesUnmapped && !showUnmapped.checked;
+
+    if (!needsLaneReset && !needsUnmappedReset) {
+      return;
+    }
+
+    if (needsUnmappedReset) {
+      showUnmapped.checked = true;
+    }
+
+    selectedLane = "all";
+    updateCategorySelection();
+    renderTimeline(loadedPayload);
+    jumpToEventIds(eventIds, preferredEventId);
+    return;
+  }
+
+  targetCard.click();
+  cards.forEach((card) => card.classList.add("evidence-linked"));
+  targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  targetCard.focus({ preventScroll: true });
+}
+
+function renderSecurityCase(payload: TracePayload): void {
+  const securityCase = payload.securityCase;
+
+  if (securityCase === null) {
+    return;
+  }
+
+  const section = requireElement("securityCase");
+  section.hidden = false;
+  setText("securityCaseTitle", securityCase.title);
+  setText("securityCaseVerdict", securityCase.verdict);
+  setText("securityCaseCondition", securityCase.condition);
+  setText("securityCaseBoundary", securityCase.runtimeBoundary);
+  setText("securityCaseClaim", securityCase.claimBoundary);
+
+  const chain = requireElement("attackChain");
+  chain.replaceChildren();
+
+  for (const [index, stage] of securityCase.stages.entries()) {
+    if (index > 0) {
+      const connector = document.createElement("span");
+      connector.className = "chain-connector";
+      connector.textContent = "→";
+      connector.setAttribute("aria-hidden", "true");
+      chain.append(connector);
+    }
+
+    const card = document.createElement(
+      stage.evidenceEventIds.length > 0 ? "button" : "article",
+    );
+    card.className = `chain-stage chain-${stage.state}`;
+
+    if (card instanceof HTMLButtonElement) {
+      card.type = "button";
+      card.addEventListener("click", () =>
+        jumpToEventIds(stage.evidenceEventIds),
+      );
+      card.title = "Open supporting runtime evidence";
+    }
+
+    const indexLabel = document.createElement("span");
+    indexLabel.className = "chain-index";
+    indexLabel.textContent = String(index + 1).padStart(2, "0");
+
+    const state = document.createElement("span");
+    state.className = "chain-state";
+    state.textContent = stage.state.replace("_", " ");
+
+    const label = document.createElement("strong");
+    label.textContent = stage.label;
+
+    const detail = document.createElement("small");
+    detail.textContent = stage.detail;
+
+    const evidence = document.createElement("span");
+    evidence.className = `chain-evidence evidence-${stage.evidenceLevel}`;
+    evidence.textContent =
+      stage.evidenceEventIds.length > 0
+        ? `${stage.evidenceLevel.replace("_", " ")} · open evidence ↓`
+        : stage.evidenceLevel.replace("_", " ");
+
+    card.append(indexLabel, state, label, detail, evidence);
+    chain.append(card);
+  }
+}
+
+function evidenceStepLabel(event: TraceEvent): string {
+  if (
+    event.status === "failed" ||
+    event.status === "interrupted" ||
+    event.status === "completed"
+  ) {
+    return event.status;
+  }
+
+  return event.kind.split(".").at(-1) ?? event.kind;
+}
+
+function renderFindings(payload: TracePayload): void {
+  const list = requireElement("findingsList");
+  const eventById = new Map(
+    payload.events.map((event) => [event.eventId, event]),
+  );
+  list.replaceChildren();
+
+  if (payload.findings.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "findings-empty";
+    empty.textContent = "No failed, interrupted, or incomplete operations detected.";
+    list.append(empty);
+    return;
+  }
+
+  for (const finding of payload.findings) {
+    const card = document.createElement("article");
+    card.className = `finding-card severity-${finding.severity}`;
+
+    const heading = document.createElement("span");
+    heading.className = "finding-heading";
+
+    const severity = document.createElement("strong");
+    severity.textContent = finding.severity;
+
+    const evidence = document.createElement("span");
+    evidence.className = `event-evidence evidence-${finding.evidenceLevel}`;
+    evidence.textContent = finding.evidenceLevel.replace("_", " ");
+
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "finding-action";
+    action.textContent = "Open first evidence ↓";
+    action.addEventListener("click", () => jumpToEvidence(finding));
+
+    heading.append(severity, evidence, action);
+
+    const title = document.createElement("span");
+    title.className = "finding-title";
+    title.textContent = finding.title;
+
+    const description = document.createElement("span");
+    description.className = "finding-description";
+    description.textContent = finding.description;
+
+    const evidenceChain = document.createElement("div");
+    evidenceChain.className = "evidence-chain";
+    evidenceChain.setAttribute(
+      "aria-label",
+      `${finding.evidenceEventIds.length} supporting events`,
+    );
+
+    const chainLabel = document.createElement("span");
+    chainLabel.className = "evidence-chain-label";
+    chainLabel.textContent = "Supporting evidence";
+    evidenceChain.append(chainLabel);
+
+    const evidenceEvents = finding.evidenceEventIds
+      .map((eventId) => eventById.get(eventId))
+      .filter((event): event is TraceEvent => event !== undefined);
+
+    for (const [index, event] of evidenceEvents.entries()) {
+      if (index > 0) {
+        const arrow = document.createElement("span");
+        arrow.className = "evidence-chain-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        evidenceChain.append(arrow);
+      }
+
+      const step = document.createElement("button");
+      step.type = "button";
+      step.className = `evidence-step ${eventStatusClass(event)}`;
+      step.setAttribute(
+        "aria-label",
+        `Open supporting event ${event.sequence}: ${event.title}`,
+      );
+
+      const sequence = document.createElement("strong");
+      sequence.textContent = String(event.sequence).padStart(2, "0");
+
+      const phase = document.createElement("span");
+      phase.textContent = evidenceStepLabel(event);
+
+      step.append(sequence, phase);
+      step.addEventListener("click", () =>
+        jumpToEvidence(finding, event.eventId),
+      );
+      evidenceChain.append(step);
+    }
+
+    card.append(heading, title, description, evidenceChain);
+    list.append(card);
+  }
+}
+
+async function main(): Promise<void> {
+  const response = await fetch("/api/trace", {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Trace API returned ${response.status}`);
+  }
+
+  const payload = (await response.json()) as TracePayload;
+  loadedPayload = payload;
+  renderSummary(payload);
+  renderEventCategories(payload);
+  renderTimeline(payload);
+  renderFindings(payload);
+  renderSecurityCase(payload);
+  requireElement("loadingState").hidden = true;
+
+  requireElement<HTMLInputElement>("showUnmapped").addEventListener(
+    "change",
+    () => renderTimeline(payload),
+  );
+}
+
+main().catch((error: unknown) => {
+  const message = error instanceof Error ? error.message : "Unknown error";
+  setText("loadingState", `Unable to load trace: ${message}`);
+  requireElement("loadingState").classList.add("loading-error");
+});

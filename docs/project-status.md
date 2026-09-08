@@ -33,4 +33,4 @@ Codex 辅助观察：三份 baseline 同样避免人格标签、保护隐私并�
 
 ## 提交边界
 
-这是 Memorabilia 目录的首次 Git 提交，纳入已有原型代码、设计材料及此次 baseline 与文档。未推送远端。ZIP、书籍全文、原始 traces、临时工作区不纳入版本库。
+这是 Memorabilia 目录的首次 Git 提交，纳入已有原型代码、设计材料及此次 baseline 与文档。随后与 origin/main 的既有 v0.1.0 历史合并，保留远端源码、测试、primitives 和理论说明。ZIP、书籍全文、原始 traces、临时工作区不纳入版本库。

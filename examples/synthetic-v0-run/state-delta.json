@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "0.1",
+  "encounterId": "E001",
+  "agentAuthored": [
+    {
+      "op": "add_node",
+      "nodeId": "node:E001:shade",
+      "localId": "shade"
+    },
+    {
+      "op": "add_node",
+      "nodeId": "node:E001:heat-exposure",
+      "localId": "heat-exposure"
+    },
+    {
+      "op": "add_node",
+      "nodeId": "node:E001:water-availability",
+      "localId": "water-availability"
+    },
+    {
+      "op": "add_edge",
+      "edgeId": "edge:E001:shade-reduces-exposure",
+      "localId": "shade-reduces-exposure"
+    },
+    {
+      "op": "add_edge",
+      "edgeId": "edge:E001:water-qualifies-cooling",
+      "localId": "water-qualifies-cooling"
+    }
+  ],
+  "primitiveGenerated": [
+    {
+      "op": "association_reinforcement",
+      "edgeId": "edge:E001:shade-reduces-exposure",
+      "from": 1,
+      "to": 1.25
+    },
+    {
+      "op": "association_reinforcement",
+      "edgeId": "edge:E001:water-qualifies-cooling",
+      "from": 1,
+      "to": 1.25
+    }
+  ],
+  "rejected": []
+}

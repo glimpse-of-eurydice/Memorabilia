@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "0.1",
+  "encounterId": "E001",
+  "activatedRefs": ["shade", "heat-exposure", "water-availability"],
+  "operations": [
+    {
+      "op": "add_node",
+      "localId": "shade",
+      "kind": "concept",
+      "label": "Canopy shade",
+      "summary": "Canopies block part of incoming solar radiation over pavement and people.",
+      "evidenceRefs": ["encounter:E001"],
+      "clusterHint": "cooling"
+    },
+    {
+      "op": "add_node",
+      "localId": "heat-exposure",
+      "kind": "concept",
+      "label": "Pedestrian heat exposure",
+      "summary": "Direct heat exposure can fall even when neighborhood air-temperature effects are modest.",
+      "evidenceRefs": ["encounter:E001"],
+      "clusterHint": "outcomes"
+    },
+    {
+      "op": "add_node",
+      "localId": "water-availability",
+      "kind": "concept",
+      "label": "Water availability",
+      "summary": "Evapotranspiration and irrigation costs depend on sufficient water and local conditions.",
+      "evidenceRefs": ["encounter:E001"],
+      "clusterHint": "constraints"
+    },
+    {
+      "op": "add_edge",
+      "localId": "shade-reduces-exposure",
+      "sourceRef": "shade",
+      "targetRef": "heat-exposure",
+      "relationLabel": "reduces direct exposure",
+      "rationale": "The encounter directly says canopy shade blocks solar radiation over people and pavement.",
+      "evidenceRefs": ["encounter:E001"]
+    },
+    {
+      "op": "add_edge",
+      "localId": "water-qualifies-cooling",
+      "sourceRef": "water-availability",
+      "targetRef": "heat-exposure",
+      "relationLabel": "qualifies cooling benefit",
+      "rationale": "Water scarcity can complicate cooling through maintenance and irrigation costs.",
+      "evidenceRefs": ["encounter:E001"]
+    }
+  ]
+}
