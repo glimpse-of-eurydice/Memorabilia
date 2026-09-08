@@ -1,0 +1,13 @@
+{
+  "status": "materials-draft-not-a-v0-runtime-config",
+  "order": ["E001", "E002", "E003"],
+  "delivery": "one-work-available-for-on-demand-exploration",
+  "carryForward": ["notebook", "concept-map"],
+  "previousSourceAvailability": "current-work-only-provisional",
+  "budget": null,
+  "encounters": [
+    {"id": "E001", "author": "Simone Weil", "title": "Gravity and Grace", "source": "user-provided-pdf", "localDirectory": "local-materials/E001"},
+    {"id": "E002", "author": "Emmanuel Levinas", "title": "Ethics as First Philosophy", "status": "live-web-encounter", "url": "https://sites.google.com/view/philosophy-texts/20th-century/phenomenology/emmanuel-levinas/ethics-as-first-philosophy"},
+    {"id": "E003", "author": "J. Krishnamurti", "title": "The Awakening of Intelligence", "source": "user-provided-epub", "localDirectory": "local-materials/E003"}
+  ]
+}

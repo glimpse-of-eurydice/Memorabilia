@@ -1,0 +1,11 @@
+.trace-inspector/
+**/local-materials/
+node_modules/
+
+# Local experiment archives, scratch files, and secrets
+*.zip
+work/
+.DS_Store
+.env
+.env.*
+__pycache__/
