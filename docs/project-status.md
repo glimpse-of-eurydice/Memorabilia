@@ -44,4 +44,4 @@ Codex 辅助观察：三份 baseline 同样避免人格标签、保护隐私并�
 
 ## 2026-09-09：Adapter 设计
 
-接口提交 af4c059 和稳定 tag 已推送 origin。新增历史只读 adapter：`LocalPilotReader` 能读取已完成 free-encounter pilot，转换 18 条 encounter 为 `EncounterView`；纯映射测试纳入 npm test。实时注册、新 HTTP 端点与完整中间快照仍未实现；不运行新实验。
+接口提交 af4c059 和稳定 tag 已推送 origin。新增历史只读 adapter：`LocalPilotReader` 能读取已完成 free-encounter pilot，转换 18 条 encounter 为 `EncounterView`；纯映射测试纳入 npm test。验收补强后，adapter 会核对 `accepted-state` 与候选 graph/notebook；缺失 `startedAt` 进入 `EncounterView.diagnostics`；真实路径通过 realpath 检查，拒绝越出 pilot root 的符号链接。实时注册、新 HTTP 端点与完整中间快照仍未实现；不运行新实验。

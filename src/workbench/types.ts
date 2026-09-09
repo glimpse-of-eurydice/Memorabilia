@@ -92,6 +92,12 @@ export interface AgentRemark {
   evidence: EvidenceRef[];
 }
 
+export interface WorkbenchDiagnostic {
+  position: Position;
+  message: string;
+  evidence: EvidenceRef[];
+}
+
 /** Full snapshot response. Refresh replaces the payload; no inferred deletions
  * from partial streamed responses. revision increases on any payload change.
  */
@@ -104,6 +110,7 @@ export interface EncounterView {
   graph: ArtifactHistory<Graph>;
   notebook: ArtifactHistory<string>;
   remarks: AgentRemark[];
+  diagnostics: WorkbenchDiagnostic[];
   /** Whether future refreshes may add data, including post-run finalization. */
   live: boolean;
 }

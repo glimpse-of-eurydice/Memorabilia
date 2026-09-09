@@ -1,6 +1,6 @@
 # Encounter 工作台接口 v0.1
 
-状态：2026-09-09，类型与行为约定；尚未实现新的 adapter、HTTP endpoint 或界面。
+状态：2026-09-09，类型与行为约定；历史只读 adapter 已实现，HTTP endpoint 与新界面仍未实现。
 类型入口：`src/workbench/types.ts`。本次不迁移旧文件，不改变 runner 或记忆规则。
 
 ## 稳定起点
@@ -73,6 +73,7 @@ WorkbenchReader.listEncounters / getEncounter 是只读端口，首先可实现�
 这些路由目前未实现。刷新返回完整 EncounterView；revision 递增，客户端不接受较旧响应覆盖新数据。
 404 表示不存在；读取失败作为错误返回，不能伪装成空列表。断线保留上次数据并显示连接状态。
 运行结束后仍可能在归档；live=false 表示服务端不预期再自动追加本次运行数据。
+`diagnostics` 保存来源不完整、接受状态不一致、非法 graph 和时间不可用等问题；这些问题不能被映射成空数据。
 
 ## 实现时的验收项
 
@@ -88,4 +89,4 @@ WorkbenchReader.listEncounters / getEncounter 是只读端口，首先可实现�
 
 ## Adapter 设计
 
-见 [本地 pilot adapter 设计](workbench-adapter-design.md)。第一版读取历史 endpoints，实时接入先补显式运行注册；设计指出诊断与刷新会话标识需要在实现前补齐。
+见 [本地 pilot adapter 设计](workbench-adapter-design.md)。第一版读取历史 endpoints，实时接入先补显式运行注册；刷新会话标识仍留给 HTTP 实现。

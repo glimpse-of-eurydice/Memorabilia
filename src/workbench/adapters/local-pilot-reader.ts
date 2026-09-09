@@ -1,5 +1,5 @@
-import { access, readdir, readFile } from "node:fs/promises";
-import { resolve, relative, join } from "node:path";
+import { access, readdir, readFile, realpath } from "node:fs/promises";
+import { resolve, relative, join, dirname } from "node:path";
 import type { TraceEvent } from "../../core/trace-event.js";
 import type { EncounterSummary, EncounterView, WorkbenchReader } from "../types.js";
 import { mapPilotEncounter, type PilotConfig, type PilotSourceBundle, type PilotStep, type PilotTraceManifest, type PilotTraceResult } from "./map-pilot.js";
@@ -58,6 +58,7 @@ export class LocalPilotReader implements WorkbenchReader {
     catch (error) { throw new PilotSourceError(`Cannot list pilot root: ${String(error)}`, this.root); }
     for (const batchId of batches.sort()) {
       const batch = this.safePath(batchId);
+      await this.verifyPath(batch);
       const config = await json<PilotConfig & {kind?: string}>(join(batch, "config.json"));
       if (config.kind === "no-memory-baseline") continue;
       const summary = await json<SummaryFile>(join(batch, "summary.json"));
@@ -91,7 +92,9 @@ export class LocalPilotReader implements WorkbenchReader {
 
   private async loadBundle(entry: {batchId: string; runId: string; step: PilotStep; config: PilotConfig}): Promise<PilotSourceBundle> {
     const dir = this.safePath(entry.batchId, entry.runId, entry.step.eid);
-    const beforeRaw = await text(join(dir, "before.json"));
+    await this.verifyPath(dir);
+    const readSourceText = async (name: string) => this.readCheckedText(join(dir, name));
+    const beforeRaw = await readSourceText("before.json");
     const before = beforeRaw === null ? null : (() => {
       try { return JSON.parse(beforeRaw) as {notebook: string; graph: unknown}; }
       catch (error) { throw new PilotSourceError(`Cannot parse before.json: ${String(error)}`, join(dir, "before.json")); }
@@ -100,30 +103,63 @@ export class LocalPilotReader implements WorkbenchReader {
     let traceManifest: PilotTraceManifest | null = null;
     let events: TraceEvent[] = [];
     if (trace?.traceDirectory) {
-      const repositoryRoot = resolve(this.root, "../..");
-      const manifestPath = resolve(repositoryRoot, trace.traceDirectory, "manifest.json");
-      traceManifest = await this.optionalJson<PilotTraceManifest>(manifestPath);
-      const replayText = await text(join(dir, "events.json"));
+      assertSegment(trace.traceId, "trace id");
+      const traceRoot = resolve(this.root, "../traces");
+      const manifestPath = resolve(traceRoot, trace.traceId, "manifest.json");
+      await this.verifyPath(manifestPath, traceRoot);
+      traceManifest = await this.optionalJson<PilotTraceManifest>(manifestPath, traceRoot);
+      const replayText = await readSourceText("events.json");
       if (replayText !== null) {
         try { events = JSON.parse(replayText) as TraceEvent[]; }
         catch (error) { throw new PilotSourceError(`Cannot parse events.json: ${String(error)}`, join(dir, "events.json")); }
       } else {
-        const eventPath = resolve(repositoryRoot, trace.traceDirectory, "events.jsonl");
-        const eventText = await text(eventPath);
+        const eventPath = resolve(traceRoot, trace.traceId, "events.jsonl");
+        const eventText = await this.readCheckedText(eventPath, traceRoot);
         if (eventText !== null) events = eventText.split("\n").filter(Boolean).map(line => JSON.parse(line) as TraceEvent);
       }
     }
-    const graphRaw = await text(join(dir, "graph-after.raw.json"));
+    const graphRaw = await readSourceText("graph-after.raw.json");
     let graphAfter: unknown | null = null;
     if (graphRaw !== null) { try { graphAfter = JSON.parse(graphRaw); } catch { graphAfter = graphRaw; } }
-    const acceptedRaw = await text(join(dir, "accepted-state.json"));
-    const acceptedState = acceptedRaw === null ? null : JSON.parse(acceptedRaw) as {notebook?: string; graph?: unknown};
-    return {batchId: entry.batchId, runId: entry.runId, step: entry.step, config: entry.config, trace, traceManifest, events, before, graphAfter, notebookAfter: await text(join(dir, "notebook-after.md")), acceptedState};
+    const acceptedRaw = await readSourceText("accepted-state.json");
+    let acceptedState: {notebook?: string; graph?: unknown} | null = null;
+    if (acceptedRaw !== null) {
+      try { acceptedState = JSON.parse(acceptedRaw) as {notebook?: string; graph?: unknown}; }
+      catch (error) { throw new PilotSourceError(`Cannot parse accepted-state.json: ${String(error)}`, join(dir, "accepted-state.json")); }
+    }
+    return {batchId: entry.batchId, runId: entry.runId, step: entry.step, config: entry.config, trace, traceManifest, events, before, graphAfter, notebookAfter: await readSourceText("notebook-after.md"), acceptedState};
   }
 
-  private async optionalJson<T>(path: string): Promise<T | null> {
+  private async optionalJson<T>(path: string, allowedRoot = this.root): Promise<T | null> {
+    await this.verifyPath(path, allowedRoot);
     if (!await exists(path)) return null;
     return json<T>(path);
+  }
+
+  private async readCheckedText(path: string, allowedRoot = this.root): Promise<string | null> {
+    await this.verifyPath(path, allowedRoot);
+    return text(path);
+  }
+
+  private async verifyPath(path: string, allowedRoot = this.root): Promise<void> {
+    const root = await realpath(allowedRoot);
+    let target: string;
+    let probe = path;
+    while (true) {
+      try {
+        target = await realpath(probe);
+        break;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw new PilotSourceError(`Cannot resolve source path: ${String(error)}`, path);
+        const parent = dirname(probe);
+        if (parent === probe) return;
+        probe = parent;
+      }
+    }
+    const rel = relative(root, target);
+    if (rel.startsWith("..") || rel === ".." || rel.includes("/../") || rel.includes("\\..\\")) {
+      throw new PilotSourceError("Source path resolves outside pilot root", path);
+    }
   }
 }
 

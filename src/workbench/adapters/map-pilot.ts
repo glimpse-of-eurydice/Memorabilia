@@ -12,6 +12,7 @@ import type {
   GraphNode,
   HistoryGap,
   Position,
+  WorkbenchDiagnostic,
   WorkbenchEvent,
 } from "../types.js";
 
@@ -59,15 +60,9 @@ export interface PilotSourceBundle {
   acceptedState: { notebook?: string; graph?: unknown } | null;
 }
 
-export interface MappingDiagnostic {
-  position: Position;
-  message: string;
-  evidence: EvidenceRef[];
-}
-
 export interface MappedPilotEncounter {
   view: EncounterView;
-  diagnostics: MappingDiagnostic[];
+  diagnostics: WorkbenchDiagnostic[];
 }
 
 const DEFAULT_TITLES: Record<string, string> = {
@@ -186,13 +181,13 @@ function toGraph(value: unknown): Graph {
   return {nodes, edges};
 }
 
-function history<T>(versions: ArtifactVersion<T>[], issues: MappingDiagnostic[], end: Position): ArtifactHistory<T> {
+function history<T>(versions: ArtifactVersion<T>[], issues: WorkbenchDiagnostic[], end: Position): ArtifactHistory<T> {
   const gaps: HistoryGap[] = versions.length > 1 ? [{from: versions[0]!.visibleFrom, to: end, reason: "only before/after snapshots were captured; intermediate writes are unknown"}] : [];
   return {coverage: versions.length > 1 ? "endpoints_only" : "partial", versions, gaps, issues};
 }
 
 export function mapPilotEncounter(bundle: PilotSourceBundle): MappedPilotEncounter {
-  const diagnostics: MappingDiagnostic[] = [];
+  const diagnostics: WorkbenchDiagnostic[] = [];
   const encounterId = `${bundle.batchId}/${bundle.runId}/${bundle.step.eid}`;
   const traceId = bundle.trace?.traceId ?? bundle.step.traceId ?? "unknown-trace";
   const startedAt = bundle.traceManifest?.startedAt ?? null;
@@ -203,7 +198,7 @@ export function mapPilotEncounter(bundle: PilotSourceBundle): MappedPilotEncount
   const endPosition = position(endMs, (events.at(-1)?.position.order ?? 0) + 1);
   const refs = (event: TraceEvent | null): EvidenceRef[] => [evidence(traceId, event)];
   const issue = (message: string, at = endPosition) => diagnostics.push({position: at, message, evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)});
-  if (!startedAt) issue("trace manifest has no startedAt; timeline position is unavailable", {elapsedMs: 0, order: 0});
+  if (!startedAt) issue("trace manifest has no startedAt; timeline position is unavailable; elapsed time is shown as unavailable", {elapsedMs: 0, order: 0});
 
   const graphVersions: ArtifactVersion<Graph>[] = [];
   const notebookVersions: ArtifactVersion<string>[] = [];
@@ -213,15 +208,23 @@ export function mapPilotEncounter(bundle: PilotSourceBundle): MappedPilotEncount
     } catch (error) { issue(`before graph invalid: ${String(error)}`, position(0, 0)); }
     notebookVersions.push({id: `${encounterId}:notebook:before`, visibleFrom: position(0, 0), content: bundle.before.notebook, contentHash: hash(bundle.before.notebook), origin: "inherited", acceptance: "accepted", evidence: refs(null)});
   } else issue("before.json is missing; inherited state cannot be shown", position(0, 0));
+  let graphAfterValue: Graph | null = null;
   if (bundle.graphAfter !== null) {
     try {
-      graphVersions.push({id: `${encounterId}:graph:after`, visibleFrom: endPosition, content: toGraph(bundle.graphAfter), contentHash: hash(stableJson(bundle.graphAfter)), origin: "end_checkpoint", acceptance: bundle.step.accepted ? "accepted" : "rejected", evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)});
+      graphAfterValue = toGraph(bundle.graphAfter);
     } catch (error) { issue(`after graph invalid: ${String(error)}`); }
   } else issue("graph-after.raw.json is missing; no end graph is exposed");
-  if (bundle.notebookAfter !== null) notebookVersions.push({id: `${encounterId}:notebook:after`, visibleFrom: endPosition, content: bundle.notebookAfter, contentHash: hash(bundle.notebookAfter), origin: "end_checkpoint", acceptance: bundle.step.accepted ? "accepted" : "rejected", evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)});
+  const acceptedGraph = bundle.acceptedState?.graph === undefined ? null : (() => { try { return toGraph(bundle.acceptedState!.graph); } catch { return null; } })();
+  const graphMatchesAccepted = graphAfterValue !== null && acceptedGraph !== null && stableJson(graphAfterValue) === stableJson(acceptedGraph);
+  const notebookMatchesAccepted = bundle.notebookAfter !== null && bundle.acceptedState?.notebook !== undefined && bundle.notebookAfter === bundle.acceptedState.notebook;
+  const acceptanceConsistent = !bundle.step.accepted || (graphMatchesAccepted && notebookMatchesAccepted);
+  if (bundle.step.accepted && !acceptanceConsistent) issue("accepted-state does not match the candidate graph/notebook; candidate remains rejected", endPosition);
+  const candidateAcceptance: ArtifactVersion<Graph>["acceptance"] = bundle.step.accepted && acceptanceConsistent ? "accepted" : "rejected";
+  if (graphAfterValue !== null) graphVersions.push({id: `${encounterId}:graph:after`, visibleFrom: endPosition, content: graphAfterValue, contentHash: hash(stableJson(graphAfterValue)), origin: "end_checkpoint", acceptance: candidateAcceptance, evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)});
+  if (bundle.notebookAfter !== null) notebookVersions.push({id: `${encounterId}:notebook:after`, visibleFrom: endPosition, content: bundle.notebookAfter, contentHash: hash(bundle.notebookAfter), origin: "end_checkpoint", acceptance: candidateAcceptance, evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)});
   else issue("notebook-after.md is missing; no end notebook is exposed");
-  const status: EncounterSummary["status"] = bundle.step.status === "interrupted" ? "interrupted" : bundle.step.accepted && bundle.trace?.status === "completed" ? "completed" : bundle.trace?.status === "running" ? "running" : "failed";
+  const status: EncounterSummary["status"] = bundle.step.status === "interrupted" ? "interrupted" : bundle.step.accepted && acceptanceConsistent && bundle.trace?.status === "completed" ? "completed" : bundle.trace?.status === "running" ? "running" : "failed";
   const summary: EncounterSummary = {id: encounterId, trajectoryId: `${bundle.batchId}/${bundle.runId}`, title: bundle.config.titles?.[bundle.step.material] ?? DEFAULT_TITLES[bundle.step.material] ?? bundle.step.material, status, budgetMs: bundle.config.timeoutMs, startedAt, endedAt, elapsedMs: Math.max(0, endMs), failure: status === "failed" ? {message: bundle.step.error ?? bundle.trace?.collectorError ?? "encounter output was not accepted", evidence: refs(events.at(-1) ? bundle.events.at(-1)! : null)} : null, materials: [{id: bundle.step.material, title: bundle.config.titles?.[bundle.step.material] ?? DEFAULT_TITLES[bundle.step.material] ?? bundle.step.material, mediaType: "text", sourceHash: null}]};
-  const view: EncounterView = {schemaVersion: "0.1", revision: 1, capturedAt: new Date().toISOString(), encounter: summary, events, graph: history(graphVersions, diagnostics.map((item) => item), endPosition), notebook: history(notebookVersions, diagnostics.map((item) => item), endPosition), remarks: [] as AgentRemark[], live: status === "running"};
+  const view: EncounterView = {schemaVersion: "0.1", revision: 1, capturedAt: new Date().toISOString(), encounter: summary, events, graph: history(graphVersions, diagnostics, endPosition), notebook: history(notebookVersions, diagnostics, endPosition), remarks: [] as AgentRemark[], diagnostics, live: status === "running"};
   return {view, diagnostics};
 }
