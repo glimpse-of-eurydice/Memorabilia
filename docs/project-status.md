@@ -34,3 +34,10 @@ Codex 辅助观察：三份 baseline 同样避免人格标签、保护隐私并�
 ## 提交边界
 
 这是 Memorabilia 目录的首次 Git 提交，纳入已有原型代码、设计材料及此次 baseline 与文档。随后与 origin/main 的既有 v0.1.0 历史合并，保留远端源码、测试、primitives 和理论说明。ZIP、书籍全文、原始 traces、临时工作区不纳入版本库。
+
+## 2026-09-09：工作台开发起点
+
+- 本地 tag `pilot-baseline-20260908` 固定 a611ce4，原 v0.1.0 保留。
+- 新增 src/workbench/types.ts 和 docs/workbench-contract.md；覆盖单一时间选择、独立图谱/笔记版本、实时事件、自述与历史缺口。
+- 23 项核心测试和 5 项 free-encounter 测试通过；接口通过 TypeScript 检查。
+- 此次仅定义接口，未重写 runner、迁移记录或实现新工作台。tag 不包含原始数据备份；本次未推送远端。

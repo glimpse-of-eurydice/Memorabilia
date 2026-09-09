@@ -1,5 +1,9 @@
 # Memorabilia
 
+## Workbench contract — 2026-09-09
+
+The pre-workbench checkpoint is tagged `pilot-baseline-20260908`. See the [workbench data contract](docs/workbench-contract.md) and `src/workbench/types.ts`. This defines the next UI boundary; the new adapter and UI are not implemented yet.
+
 ## Current experiments — 2026-09-08
 
 Six encounter-order trajectories and three no-memory H001 baselines are complete. See [local experiment guide](docs/local-experiments.md), [project status](docs/project-status.md), and [baseline responses](docs/baseline-20260908.md). The free-encounter pilot is distinct from the original bounded v0 apparatus documented below.
