@@ -8,6 +8,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "workbench": "tsc && node dist/workbench/view-cli.js",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "preflight": "tsc && node dist/case-study/thought-space-v0/preflight-cli.js",
@@ -19,5 +20,8 @@
   "devDependencies": {
     "@types/node": "^22.20.1",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "markdown-it": "^15.0.1"
   }
 }

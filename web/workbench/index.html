@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Memorabilia · Encounter</title><meta name="description" content="Observe an encounter through its trace, graph and notebook."><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script></head>
+<body>
+  <header class="masthead"><a class="wordmark" href="/">memorabilia<span class="brand-dot">✳</span></a><span class="edition">A FIELD RECORD OF ENCOUNTERS</span><span class="local"><i></i> LOCAL WORKBENCH</span></header>
+  <main>
+    <section class="encounter-heading"><div><div class="eyebrow">OBSERVATORY / 01</div><h1>Encounter</h1></div><div class="pickers"><label>轨迹<select id="trajectory" disabled></select></label><label>材料<select id="encounter" disabled></select></label></div><span class="status" id="status">正在载入</span></section>
+    <div id="error" role="alert" hidden></div>
+    <section class="workbench" aria-label="Encounter 工作台">
+      <aside class="trace-panel"><div class="panel-heading"><h2>Trace <span>运行记录</span></h2><span class="mono" id="event-count">—</span></div><div class="trace-scroll" id="trace"><p class="empty">正在读取本地记录…</p></div></aside>
+      <div class="workspace">
+        <section class="timeline"><div class="timeline-top"><div><span class="eyebrow">ENCOUNTER TIME</span><div class="clock"><strong id="cursor-time">00:00</strong><span id="budget">/ 10:00</span></div></div><div class="time-actions"><button id="start" disabled>起点</button><button id="end" disabled>结束快照 ↗</button></div></div><input id="scrubber" type="range" min="0" max="600000" value="0" step="1" aria-label="观察时间" disabled><div class="time-labels"><span>00:00</span><span id="actual-time">—</span><span id="budget-end">10:00</span></div></section>
+        <section class="graph-panel"><div class="panel-heading"><h2>Graph <span>概念与连接</span></h2><span id="graph-count" class="mono">—</span></div><div class="graph-stage"><svg id="graph" viewBox="0 0 1000 530" role="group" aria-label="概念连接图"></svg><p id="graph-empty" class="graph-empty" hidden>尚未记录 graph</p><div id="node-detail" hidden><button id="close-node" aria-label="关闭节点详情">×</button><span class="eyebrow">CONCEPT</span><h3 id="node-label"></h3><p id="node-description"></p><code id="node-id"></code></div><div class="graph-legend"><span><i class="old-dot"></i> 已有节点</span><span><i class="new-dot"></i> 本次新增</span></div></div><div class="artifact-caption" id="graph-caption">—</div></section>
+        <section class="notebook-panel"><div class="panel-heading"><h2>Notebook <span>留下的笔记</span></h2><span class="mono" id="notebook-version">—</span></div><article id="notebook"><p class="empty">尚未记录笔记。</p></article></section>
+      </div>
+    </section>
+    <footer><div><span class="eyebrow">运行记录</span><span id="operation">等待记录</span></div><div><span class="eyebrow">AGENT 留言</span><span id="remark">尚无留言</span></div></footer>
+    <details id="diagnostics" hidden><summary>数据诊断</summary><pre></pre></details>
+  </main>
+</body></html>

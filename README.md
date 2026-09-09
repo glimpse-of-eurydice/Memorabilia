@@ -1,8 +1,59 @@
 # Memorabilia
 
-## Workbench contract — 2026-09-09
+An experimental workbench for observing how encounters leave traces, notes,
+and connections in an agent's external memory.
 
-The pre-workbench checkpoint is tagged `pilot-baseline-20260908`. See the [workbench data contract](docs/workbench-contract.md) and `src/workbench/types.ts`. This defines the next UI boundary; the new adapter and UI are not implemented yet.
+## Encounter workbench
+
+![Memorabilia encounter workbench with bilingual annotations for Trace, Graph, and Notebook](figures/encounter_observatory.png)
+
+*Annotated workbench overview. The current pilot supports historical replay
+with before-and-after artifact snapshots.*
+
+The workbench brings three views of an encounter into one shared timeline:
+
+- **Trace** — inspect recorded operations and agent outputs. Select an event
+  to locate the latest saved graph and notebook at that position.
+- **Graph** — explore concepts, connections, and node descriptions. Distinguish
+  inherited nodes from additions made during the selected encounter.
+- **Notebook** — read the agent's saved reflections, questions, and notes in
+  Markdown, and browse the recorded versions.
+
+Switch between trajectories and materials, scrub the encounter timeline, or
+select a trace event to inspect the corresponding recorded state. Graph and
+notebook versions are resolved independently against the same time selection.
+
+**Current scope:** a read-only local adapter loads 18 encounters across six
+pilot trajectories. These records contain only starting and ending artifact
+snapshots. During the interval, the workbench shows the last recorded state;
+it does not reconstruct intermediate writes or imply continuous graph growth.
+Live artifact capture, long-term memory consolidation, and conversation are
+future work. The graph represents agent-authored external records, not direct
+access to hidden model cognition.
+
+### Run the workbench locally
+
+Requires Node.js 22 or later and local free-encounter pilot data:
+
+```bash
+npm install
+npm run workbench
+```
+
+Open [localhost:4336](http://127.0.0.1:4336/). The default data directory is
+`.trace-inspector/permutation-pilot`; use `PILOT_ROOT` to select another pilot
+directory and `PORT` to change the port. This command opens the viewer without
+launching a model run.
+
+**The private pilot dataset is not included in the repository.** A fresh clone
+cannot reproduce the pictured workbench without that data. For a public,
+credential-free example of the original apparatus, follow the
+[frozen v0 quick start](#frozen-v0-quick-start) below.
+
+See the [workbench guide](docs/workbench-ui.md),
+[data contract](docs/workbench-contract.md), and
+[adapter design](docs/workbench-adapter-design.md). The pre-workbench checkpoint
+is preserved under the tag `pilot-baseline-20260908`.
 
 ## Current experiments — 2026-09-08
 
@@ -138,7 +189,7 @@ v0 is apparatus validation. It asks whether the scaffold can be configured,
 observed, replayed, and intervened on. It does not estimate primitive effects,
 experience-order effects, hidden model cognition, or human-like memory.
 
-## Quick start
+## Frozen v0 quick start
 
 Requirements: Node.js 22 or later. A real run additionally requires a local
 Codex Desktop app-server installation.
@@ -164,6 +215,11 @@ are not copied into its temporary workspace.
 
 ## Repository map
 
+- `web/workbench/`: encounter workbench interface, graph layout, and styling
+- `src/workbench/`: data contract, local pilot adapter, shared time selection,
+  Markdown rendering, HTTP server, and tests
+- `figures/`: README presentation images
+- `case-studies/free-encounter/`: free-encounter pilot protocol and tooling
 - `primitives/`: staged primitive-design documents that freeze concepts before
   parameters
   - `README.md`: Layer A/B/C lifecycle and current research sequence

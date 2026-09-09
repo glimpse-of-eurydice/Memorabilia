@@ -45,3 +45,7 @@ Codex 辅助观察：三份 baseline 同样避免人格标签、保护隐私并�
 ## 2026-09-09：Adapter 设计
 
 接口提交 af4c059 和稳定 tag 已推送 origin。新增历史只读 adapter：`LocalPilotReader` 能读取已完成 free-encounter pilot，转换 18 条 encounter 为 `EncounterView`；纯映射测试纳入 npm test。验收补强后，adapter 会核对 `accepted-state` 与候选 graph/notebook；缺失 `startedAt` 进入 `EncounterView.diagnostics`；真实路径通过 realpath 检查，拒绝越出 pilot root 的符号链接。实时注册、新 HTTP 端点与完整中间快照仍未实现；不运行新实验。
+
+## 2026-09-09：Encounter 工作台第一版
+
+新增独立本地工作台（`npm run workbench`，默认 4336）：暖白与苔绿界面、轨迹/材料选择、横向时间轴、竖向 trace、基于连接的 graph 布局、节点详情和 notebook。时间轴与 trace 共用观察位置；图谱和笔记分别选择该位置之前最近的已记录版本。旧实验仅提供起止快照，页面明确标示缺口，不伪造中间生长过程。保留原 viewer；未启动新实验。运行中订阅、完整中间快照、conversation 和 dream 尚未实现。接口与选择规则有自动化测试，浏览器视觉与交互验收待用户试用。使用说明见 `docs/workbench-ui.md`。
