@@ -41,3 +41,7 @@ Codex 辅助观察：三份 baseline 同样避免人格标签、保护隐私并�
 - 新增 src/workbench/types.ts 和 docs/workbench-contract.md；覆盖单一时间选择、独立图谱/笔记版本、实时事件、自述与历史缺口。
 - 23 项核心测试和 5 项 free-encounter 测试通过；接口通过 TypeScript 检查。
 - 此次仅定义接口，未重写 runner、迁移记录或实现新工作台。tag 不包含原始数据备份；本次未推送远端。
+
+## 2026-09-09：Adapter 设计
+
+接口提交 af4c059 和稳定 tag 已推送 origin。新增历史只读 adapter：`LocalPilotReader` 能读取已完成 free-encounter pilot，转换 18 条 encounter 为 `EncounterView`；纯映射测试纳入 npm test。实时注册、新 HTTP 端点与完整中间快照仍未实现；不运行新实验。

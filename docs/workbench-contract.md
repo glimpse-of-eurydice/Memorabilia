@@ -85,3 +85,7 @@ WorkbenchReader.listEncounters / getEncounter 是只读端口，首先可实现�
 7. 查看与节点点击不触发模型或改写实验状态。
 
 这些是后续行为测试的验收要求；当前只定义类型，没有虚构已完成的运行测试。
+
+## Adapter 设计
+
+见 [本地 pilot adapter 设计](workbench-adapter-design.md)。第一版读取历史 endpoints，实时接入先补显式运行注册；设计指出诊断与刷新会话标识需要在实现前补齐。
