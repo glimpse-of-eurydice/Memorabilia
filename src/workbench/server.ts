@@ -25,9 +25,10 @@ export function createWorkbenchServer(reader: WorkbenchReader) {
     try {
       const url = new URL(req.url ?? '/', 'http://localhost');
       if (url.pathname === '/api/encounters') {send(200, await reader.listEncounters()); return;}
-      if (url.pathname === '/api/encounter') {
+      if (url.pathname === '/api/encounter' || url.pathname === '/api/probes') {
         const id = url.searchParams.get('id');
         if (!id || !/^[\w-]+\/[\w-]+\/t\d+$/.test(id)) {send(400, {error: 'Invalid encounter ID'}); return;}
+        if (url.pathname === '/api/probes') {send(200, {markdown: reader.getProbeMarkdown ? await reader.getProbeMarkdown(id) : null}); return;}
         send(200, await reader.getEncounter(id)); return;
       }
       const asset = assets.get(url.pathname);

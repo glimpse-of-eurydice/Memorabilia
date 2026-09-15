@@ -25,6 +25,10 @@ export interface RecordCodexTurnOptions {
   additionalWritableRoots?: string[];
   model?: string;
   reasoningEffort?: string;
+  /** Explicit experimental runtime configuration; never changes user config files. */
+  configOverrides?: Record<string, unknown>;
+  baseInstructions?: string;
+  onTraceStarted?: (traceId: string, traceDirectory: string) => Promise<void>;
 }
 
 export interface RecordCodexTurnResult {
@@ -188,11 +192,14 @@ export async function recordCodexTurn(
 ): Promise<RecordCodexTurnResult> {
   const traceId = createTraceId();
   const paths = await createTraceDirectory(traceId);
+  await options.onTraceStarted?.(traceId, paths.directory);
   const startedAt = new Date().toISOString();
   const timeoutMs = options.timeoutMs ?? 120_000;
   const codexBinary = await resolveCodexBinary();
   const sandboxMode = options.sandboxMode ?? "readOnly";
-  const child = spawn(codexBinary, ["app-server", "--stdio"], {
+  const configArgs = Object.entries(options.configOverrides ?? {}).flatMap(([key, value]) =>
+    ["-c", `${key}=${JSON.stringify(value)}`]);
+  const child = spawn(codexBinary, ["app-server", "--stdio", ...configArgs], {
     cwd: options.cwd,
     stdio: ["pipe", "pipe", "pipe"],
   });
@@ -265,7 +272,8 @@ export async function recordCodexTurn(
           params: {
             cwd: options.cwd,
             approvalPolicy: "never",
-            sandbox: threadSandboxValue(sandboxMode),
+            ...(options.configOverrides?.default_permissions ? {} : {sandbox: threadSandboxValue(sandboxMode)}),
+            baseInstructions: options.baseInstructions,
             ephemeral: true,
             model: options.model,
           },
@@ -290,7 +298,7 @@ export async function recordCodexTurn(
           ],
         };
 
-        if (sandboxMode === "workspaceWrite") {
+        if (sandboxMode === "workspaceWrite" && !options.configOverrides?.default_permissions) {
           const writableRoots = workspaceWritableRoots(
             options.cwd,
             options.additionalWritableRoots,

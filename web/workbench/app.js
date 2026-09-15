@@ -2,6 +2,7 @@ import {versionAt,eventAt,comparePosition} from '/select-at.js';
 import {layoutGraph,drawGraph} from '/graph.js';
 import {renderNotebookMarkdown} from '/notebook-markdown.js';
 const $=id=>document.getElementById(id);
+let followLive=true,probeMarkdown=null;
 let catalog=[],view=null,cursor={elapsedMs:0,order:0},positions=new Map(),selected=null,request=0,notebookId;
 const fmt=ms=>`${String(Math.floor(Math.max(0,ms)/60000)).padStart(2,'0')}:${String(Math.floor(Math.max(0,ms)/1000)%60).padStart(2,'0')}`;
 const put=(id,text)=>{$(id).textContent=text;};
@@ -17,18 +18,19 @@ function eventTitle(event){
 function latestPosition(){return [{elapsedMs:view.encounter.elapsedMs,order:0},...view.events.map(e=>e.position),...view.graph.versions.map(v=>v.visibleFrom),...view.notebook.versions.map(v=>v.visibleFrom)].sort(comparePosition).at(-1);}
 function options(select,items,value){select.replaceChildren(...items.map(([id,label])=>{const o=document.createElement('option');o.value=id;o.textContent=label;return o;}));select.value=value;select.disabled=false;}
 function fillEncounters(){const items=catalog.filter(e=>e.trajectoryId===$('trajectory').value);options($('encounter'),items.map(e=>[e.id,`${e.id.split('/').at(-1).toUpperCase()} · ${e.title}`]),items[0]?.id);if(items.length)loadEncounter(items[0].id);}
-async function loadEncounter(id){
+async function loadEncounter(id,refresh=false){
   const ticket=++request;put('status','正在载入');$('error').hidden=true;
   for(const key of ['scrubber','start','end'])$(key).disabled=true;
   try {
     const next=await get('/api/encounter?id='+encodeURIComponent(id));if(ticket!==request)return;
-    view=next;selected=null;notebookId=null;positions=layoutGraph(view.graph.versions);cursor=latestPosition();
+    view=next;if(!refresh){selected=null;followLive=true;}notebookId=null;positions=layoutGraph(view.graph.versions);if(!refresh||followLive)cursor=latestPosition();
     put('status',`${view.live?'运行中':'历史回放'} · ${{completed:'已完成',failed:'失败',running:'运行中',queued:'等待',interrupted:'已中断'}[view.encounter.status]}`);
     $('scrubber').max=String(Math.max(view.encounter.budgetMs,cursor.elapsedMs,1));
     put('budget','/ '+fmt(view.encounter.budgetMs));put('budget-end',fmt(Number($('scrubber').max)));put('actual-time',`实际结束 ${fmt(view.encounter.elapsedMs)}`);
     for(const key of ['scrubber','start','end'])$(key).disabled=!view.encounter.startedAt;
     $('diagnostics').hidden=!view.diagnostics.length;$('diagnostics').querySelector('pre').textContent=view.diagnostics.map(d=>d.message).join('\n\n');
-    renderTrace();render(true);
+    renderTrace();render(!refresh||followLive);
+    const observation=await get('/api/probes?id='+encodeURIComponent(id));if(ticket!==request)return;probeMarkdown=observation.markdown;$('probe-panel').hidden=probeMarkdown===null;if(probeMarkdown!==null)$('probe-content').innerHTML=renderNotebookMarkdown(probeMarkdown);
   }catch(error){if(ticket===request){view=null;put('status','读取失败');showError(error);}}
 }
 function renderTrace(){
@@ -36,7 +38,7 @@ function renderTrace(){
   for(const event of view.events){
     const row=document.createElement('div');row.className='trace-event';row.dataset.eventId=event.id;
     const button=document.createElement('button');button.className='event-select';const time=document.createElement('time');time.textContent=fmt(event.position.elapsedMs);const title=document.createElement('strong');title.textContent=eventTitle(event);button.append(time,title);
-    button.onclick=()=>{cursor=event.position;render(false);};row.append(button);
+    button.onclick=()=>{followLive=false;cursor=event.position;render(false);};row.append(button);
     if(event.detail||eventTitle(event)!==event.title){const details=document.createElement('details');details.className='event-detail';const summary=document.createElement('summary');summary.textContent='查看内容';const pre=document.createElement('pre');pre.textContent=event.detail||event.title;details.append(summary,pre);row.append(details);}
     $('trace').append(row);
   }
@@ -69,6 +71,14 @@ function render(scroll){
   put('notebook-version',note?`${origin[note.origin]} · ${acceptance[note.acceptance]}`:'无可用快照');
 }
 $('trajectory').onchange=fillEncounters;$('encounter').onchange=()=>loadEncounter($('encounter').value);
-$('scrubber').oninput=()=>{cursor={elapsedMs:Number($('scrubber').value),order:Number.MAX_SAFE_INTEGER};render(true);};
-$('start').onclick=()=>{cursor={elapsedMs:0,order:0};render(true);};$('end').onclick=()=>{cursor=latestPosition();render(true);};$('close-node').onclick=()=>{selected=null;render(false);};
+$('scrubber').oninput=()=>{followLive=false;cursor={elapsedMs:Number($('scrubber').value),order:Number.MAX_SAFE_INTEGER};render(true);};
+$('start').onclick=()=>{followLive=false;cursor={elapsedMs:0,order:0};render(true);};$('end').onclick=()=>{followLive=true;cursor=latestPosition();render(true);};$('close-node').onclick=()=>{selected=null;render(false);};
 try{catalog=await get('/api/encounters');if(!catalog.length){put('status','暂无 encounter');put('trace','还没有可读取的本地 encounter。');}else{const trajectories=[...new Set(catalog.map(e=>e.trajectoryId))];const first=trajectories.find(id=>id.includes('/WLK'))??trajectories[0];options($('trajectory'),trajectories.map(id=>[id,id.split('/').at(-1)]),first);fillEncounters();}}catch(error){put('status','读取失败');showError(error);}
+
+$('download-probes').onclick=()=>{if(!probeMarkdown)return;const url=URL.createObjectURL(new Blob([probeMarkdown],{type:'text/markdown;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=`${view.encounter.id.replaceAll('/','-')}-probes.md`;link.click();URL.revokeObjectURL(url);};
+let refreshing=false;
+setInterval(async()=>{if(refreshing)return;refreshing=true;try{
+ const next=await get('/api/encounters');
+ if(JSON.stringify(next.map(e=>e.id))!==JSON.stringify(catalog.map(e=>e.id))){catalog=next;const trajectory=$('trajectory').value;const ids=[...new Set(catalog.map(e=>e.trajectoryId))];options($('trajectory'),ids.map(id=>[id,id.split('/').at(-1)]),ids.includes(trajectory)?trajectory:ids[0]);const current=$('encounter').value;const items=catalog.filter(e=>e.trajectoryId===$('trajectory').value);options($('encounter'),items.map(e=>[e.id,`${e.id.split('/').at(-1).toUpperCase()} · ${e.title}`]),items.some(e=>e.id===current)?current:items[0]?.id);if(!view&&items.length)await loadEncounter(items[0].id);}
+ if(view?.live)await loadEncounter(view.encounter.id,true);
+}catch(error){showError(error);}finally{refreshing=false;}},3000);

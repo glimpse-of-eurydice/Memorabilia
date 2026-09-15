@@ -55,9 +55,51 @@ See the [workbench guide](docs/workbench-ui.md),
 [adapter design](docs/workbench-adapter-design.md). The pre-workbench checkpoint
 is preserved under the tag `pilot-baseline-20260908`.
 
-## Current experiments — 2026-09-08
+## Latest field observation — Set A
 
-Six encounter-order trajectories and three no-memory H001 baselines are complete. See [local experiment guide](docs/local-experiments.md), [project status](docs/project-status.md), and [baseline responses](docs/baseline-20260908.md). The free-encounter pilot is distinct from the original bounded v0 apparatus documented below.
+The first five-encounter Set A sequence was completed on 2026-09-15 with a
+probe barrier after every accepted checkpoint:
+
+```text
+Frankenstein → An Alien Mind → Hamlet
+→ Sapolsky on depression → companion-memory ethics
+```
+
+The run produced an unexpected transition after the fifth encounter. The
+external graph changed from 116 nodes / 168 edges to 63 nodes / 85 edges while
+the notebook changed from 28,277 to 18,317 characters. A controlled C0/C4/C5
+follow-up found a mixed result: some fine-grained details became unrecoverable,
+while cross-encounter synthesis around hidden minds, care and control, and
+creator responsibility became more explicit.
+
+<table>
+  <tr>
+    <td width="50%"><img src="figures/encounter-4.png" alt="C4 graph after the depression lecture, with 116 nodes and 168 links"></td>
+    <td width="50%"><img src="figures/encounter-5.png" alt="C5 graph after the companion AI memory ethics essay, with 63 nodes and 85 links"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>C4</strong> · before the final encounter</td>
+    <td align="center"><strong>C5</strong> · after the final encounter</td>
+  </tr>
+</table>
+
+This is an exploratory observation of an agent-authored external state. It
+does not establish sleep-like consolidation, an internal representation
+change, or a causal effect of the fifth material. The current update primitive
+asks the model to regenerate the complete graph and notebook, and the current
+probe supplies the complete checkpoint rather than running selective retrieval.
+
+See the [Set A materials and provenance](encounters/set_A/README.md),
+[run protocol and results](docs/set-a-observation.md), and
+[encounter/probe barrier](docs/encounter-probe-barrier.md).
+
+## Earlier experiments — 2026-09-08
+
+Six encounter-order trajectories and three no-memory H001 baselines are complete.
+See [local experiment guide](docs/local-experiments.md),
+[project status](docs/project-status.md), and
+[baseline responses](docs/baseline-20260908.md). The free-encounter pilot is
+distinct from the original bounded v0 apparatus documented below.
 
 ## A question before an architecture
 
@@ -218,6 +260,9 @@ are not copied into its temporary workspace.
 - `web/workbench/`: encounter workbench interface, graph layout, and styling
 - `src/workbench/`: data contract, local pilot adapter, shared time selection,
   Markdown rendering, HTTP server, and tests
+- `src/observation/`: checkpoint, probe-barrier, and Set A orchestration code
+- `encounters/set_A/`: public-domain/author-owned materials plus metadata-only
+  references for locally acquired sources
 - `figures/`: README presentation images
 - `case-studies/free-encounter/`: free-encounter pilot protocol and tooling
 - `primitives/`: staged primitive-design documents that freeze concepts before

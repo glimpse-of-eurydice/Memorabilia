@@ -1,0 +1,5 @@
+# Keep locally acquired source material out of version control.
+*
+!.gitignore
+!README.md
+!sources.yaml

@@ -122,5 +122,6 @@ export type Selection =
 
 export interface WorkbenchReader {
   listEncounters(): Promise<EncounterSummary[]>;
+  getProbeMarkdown?(encounterId: string): Promise<string>;
   getEncounter(encounterId: string): Promise<EncounterView>;
 }

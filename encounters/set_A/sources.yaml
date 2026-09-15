@@ -1,0 +1,101 @@
+# Source inventory, not an executable runner configuration.
+schema_version: 1
+set_id: set_A
+recorded_on: "2026-09-14"
+order_basis: "Researcher-selected exploratory sequence; no causal rationale or counterbalancing claimed."
+path_base: "encounters/set_A"
+checksum_scope: "SHA-256 of the exact UTF-8 source artifact embedded without preprocessing in the Set A v0.1 encounter prompt; the complete prompt has a separate run-local checksum."
+encounters:
+  - id: E1
+    order: 1
+    title: "Frankenstein; or, the Modern Prometheus"
+    author: "Mary Wollstonecraft Shelley"
+    type: "novel"
+    language: "en"
+    distribution: "bundled"
+    local_path: "Bundled/Frankstein.txt"
+    source_url: "https://www.gutenberg.org/ebooks/84"
+    source_status: "identified"
+    version_notes: "Identified by Project Gutenberg ebook 84 markers in the local file. Exact historical edition and download date not recorded."
+    rights_notes: "Public-domain literary work; Project Gutenberg distribution terms and applicable jurisdiction still apply."
+    rights_reference: "https://www.gutenberg.org/policy/license.html"
+    sha256: "09e57937ab6d132b00129f85825893eb0a0dfefe30f4362183928ad523818b59"
+    size_bytes: 421632
+    selection_status: "full_file_frozen_for_set_a_v0.1"
+    selection: "entire_file"
+    preprocessing: "None applied while creating this inventory; existing user formatting retained."
+  - id: E2
+    order: 2
+    title: "An Alien Mind"
+    author: "Jakub Pachocki"
+    type: "essay"
+    language: "en"
+    distribution: "referenced"
+    local_path: "Referenced/An_alien_mind.txt"
+    source_url: "https://openai.com/index/an-alien-mind/"
+    source_status: "identified"
+    version_notes: "Source URL and author are present in the local text. User-prepared web text; extraction procedure and acquisition date not recorded."
+    rights_notes: "No redistribution permission verified; local text is excluded from Git."
+    rights_reference: null
+    sha256: "29e1152ffbeeddd6866abd8d682949f30a133ddf00fd57aca23847da93b4931c"
+    size_bytes: 19196
+    selection_status: "full_file_frozen_for_set_a_v0.1"
+    selection: "entire_file"
+    preprocessing: "None applied while creating this inventory; existing user formatting retained."
+    acquisition_instructions: "Consult the source and applicable terms; obtain a permitted local text copy at local_path. Compare its byte checksum. A fresh copy may differ; do not silently substitute it for the recorded artifact."
+  - id: E3
+    order: 3
+    title: "The Tragedy of Hamlet, Prince of Denmark"
+    author: "William Shakespeare"
+    type: "play"
+    language: "en"
+    distribution: "bundled"
+    local_path: "Bundled/Hamlet.txt"
+    source_url: "https://www.gutenberg.org/ebooks/1524"
+    source_status: "identified"
+    version_notes: "Identified by Project Gutenberg ebook 1524 markers in the local file. Exact historical edition and download date not recorded."
+    rights_notes: "Public-domain literary work; Project Gutenberg distribution terms and applicable jurisdiction still apply."
+    rights_reference: "https://www.gutenberg.org/policy/license.html"
+    sha256: "b4071d2a8bd979b230d3698759dfe5f5e4e8047b40715bac05b8d15c588e1f83"
+    size_bytes: 180565
+    selection_status: "full_file_frozen_for_set_a_v0.1"
+    selection: "entire_file"
+    preprocessing: "None applied while creating this inventory; existing user formatting retained."
+  - id: E4
+    order: 4
+    title: "The Biology and Psychology of Depression"
+    author: "Robert Sapolsky"
+    type: "lecture_transcript"
+    language: "en"
+    distribution: "referenced"
+    local_path: "Referenced/Transcripts.txt"
+    source_url: "https://www.youtube.com/watch?v=fzUXcBTQXKM"
+    source_status: "researcher_confirmed"
+    version_notes: "Researcher confirmed the updated lecture on 2026-09-14. Stanford upload describes a 2023 update, published 2024-03-13. Caption origin, completeness and acquisition date remain unverified."
+    rights_notes: "No redistribution permission verified; local transcript is excluded from Git."
+    rights_reference: null
+    sha256: "cd413a840f5de4fd9359f4f871f9a4a967da5b98197b7b7a8ec92bef3278c829"
+    size_bytes: 115597
+    selection_status: "full_file_frozen_for_set_a_v0.1"
+    selection: "entire_file"
+    preprocessing: "None applied while creating this inventory; existing user formatting retained."
+    previously_suggested_url: "https://www.youtube.com/watch?v=NOAgplgTxfc&t=395s"
+    acquisition_instructions: "Consult the source and applicable terms; obtain a permitted local text copy at local_path. Compare its byte checksum. A fresh copy may differ; do not silently substitute it for the recorded artifact."
+  - id: E5
+    order: 5
+    title: "当陪伴不再承诺永恒：Companion AI 的记忆伦理"
+    author: "Jingwen Qiu"
+    type: "blog"
+    language: "zh"
+    distribution: "bundled"
+    local_path: "Bundled/2026-03-31-companion-ai-memory-ethics.md"
+    source_url: "https://glimpse-of-eurydice.github.io/2026/03/31/companion-ai-memory-ethics.html"
+    source_status: "identified"
+    version_notes: "Author-provided Markdown with publication date 2026-03-31 in front matter; front matter retained unchanged."
+    rights_notes: "Author selected this text for bundling. No new blanket content license is assigned here; third-party quotations retain their own rights."
+    rights_reference: null
+    sha256: "bf78e7c8197f3244dc6cb2a5b68fee0dd348083481e6433fb11b3179d1a50faf"
+    size_bytes: 23351
+    selection_status: "full_file_frozen_for_set_a_v0.1"
+    selection: "entire_file"
+    preprocessing: "None applied while creating this inventory; existing user formatting retained."
