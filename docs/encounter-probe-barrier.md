@@ -18,9 +18,9 @@ First implementation: one existing runtime, notebook + graph checkpoints, an emp
 - case-studies/free-encounter/pilot.mjs: accepts notebook/graph state after encounters; runs H001 only after three encounters; uses a separate temporary probe workspace, readOnly runtime mode, and embeds full memory into the prompt. This is full-context provision, not selective retrieval.
 - The pilot records a probe state hash, but lacks a reusable per-checkpoint branch barrier and an audit proving next-encounter equivalence with versus without probes.
 - Its tool check covers selected normalized event kinds. case-studies/free-encounter/probe-prompt.mjs has a broader raw item-start classifier already used by baseline code; unsupported operation types require review.
-- The pilot dynamically imports a collector from TRACE_INSPECTOR_ROOT or ../thought-space. Record and pin the actual collector revision; inspecting the in-repo copy does not establish which code produced an old run.
+- Historical free-encounter runs dynamically imported a collector from `TRACE_INSPECTOR_ROOT` or `../thought-space`; their recorded runtime provenance remains authoritative. Current scripts import the integrated `src/trace-inspector/` module after a local build and no longer depend on a sibling checkout.
 - src/case-study/thought-space-v0/runner.ts: separate probe workspace, retrieval records, workspace/leakage audits. It allows response.md in a disposable writable workspace. This illustrates why controlled output writes can be acceptable while writes to canonical memory cannot.
-- src/collector/codex-app-server.ts uses a fresh ephemeral thread/start. Fresh thread and readOnly alone do not prove complete isolation of filesystem reads, external stores or provider-side state.
+- `src/trace-inspector/collector/codex-app-server.ts` uses a fresh ephemeral thread/start. Fresh thread and readOnly alone do not prove complete isolation of filesystem reads, external stores or provider-side state.
 
 ## Two lanes, one-way data transfer
 
@@ -162,4 +162,3 @@ Use a snapshot-scoped read interface instead of introducing a large backend regi
 - If scheduled consolidation becomes wall-clock dependent, should probe time pause logical development time? v0 is serial and event-driven to avoid this confound.
 
 Design agreement and implementation acceptance are separate milestones. No new experiment, score, or claim of demonstrated divergence is produced by this document.
-

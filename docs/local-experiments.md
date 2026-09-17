@@ -15,7 +15,7 @@
 
 ## 本地运行
 
-需要 Node.js、已登录的 Codex CLI，以及已构建的 sibling Thought Space / Trace Inspector collector。默认依赖 ../thought-space/dist，可通过 TRACE_INSPECTOR_ROOT 覆盖；CODEX_BIN 可指定 CLI。当前依赖仍是本地路径，不是可独立安装的软件包。
+需要 Node.js、已登录的 Codex CLI，以及当前仓库已构建的 Trace Inspector module。先运行 `npm run build`；free-encounter 脚本读取 `dist/trace-inspector/index.js`。不再依赖 sibling `../thought-space` 或 `TRACE_INSPECTOR_ROOT`；`CODEX_BIN` 仍可指定 CLI。
 
 ```sh
 node --test case-studies/free-encounter/*.test.mjs

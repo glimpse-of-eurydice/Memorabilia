@@ -11,8 +11,9 @@ automatically; the dashboard does not feed materials or change run state.
 The local server must remain running while viewing. No additional packages
 or hosted service are required.
 
-Local playground entry point using the existing Trace Inspector collector from
-the sibling thought-space checkout (override with TRACE_INSPECTOR_ROOT).
+The local playground uses the Trace Inspector module integrated into this
+repository. Run `npm run build` before invoking these legacy `.mjs` scripts
+directly.
 
 Run from the memorabilia directory:
 

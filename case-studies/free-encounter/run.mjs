@@ -1,15 +1,13 @@
 import {mkdir, mkdtemp, readFile, writeFile, cp, readdir, lstat} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve, join, dirname} from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
+import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {validateGraph} from './graph.mjs';
+import {recordCodexTurn,replayTrace} from '../../dist/trace-inspector/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '../..');
-const collectorRoot = resolve(process.env.TRACE_INSPECTOR_ROOT ?? join(root, '../thought-space'));
-const {recordCodexTurn} = await import(pathToFileURL(join(collectorRoot, 'dist/collector/codex-app-server.js')));
-const {replayTrace} = await import(pathToFileURL(join(collectorRoot, 'dist/replay/replay-trace.js')));
 process.chdir(root);
 const hash = x => createHash('sha256').update(x).digest('hex');
 const json = async (p,x) => writeFile(p, JSON.stringify(x,null,2)+'\n');

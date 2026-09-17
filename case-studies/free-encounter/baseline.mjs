@@ -1,9 +1,10 @@
 import {mkdir, mkdtemp, readFile, writeFile, readdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve, join, dirname} from 'node:path';
-import {fileURLToPath, pathToFileURL} from 'node:url';
+import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {buildProbePrompt, toolStarts} from './probe-prompt.mjs';
+import {recordCodexTurn,replayTrace} from '../../dist/trace-inspector/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 process.chdir(root);
@@ -25,9 +26,6 @@ if (process.argv.includes('--check')) {
   console.log('All original probe prompts match; baseline uses empty memory and the same template. No model calls.');
   process.exit(0);
 }
-const collector = resolve(process.env.TRACE_INSPECTOR_ROOT ?? join(root, '../thought-space'));
-const {recordCodexTurn} = await import(pathToFileURL(join(collector, 'dist/collector/codex-app-server.js')));
-const {replayTrace} = await import(pathToFileURL(join(collector, 'dist/replay/replay-trace.js')));
 const resumeId = process.env.BASELINE_RESUME;
 if (resumeId && !/^batch-\d+$/.test(resumeId)) throw Error('Invalid resume ID');
 const batchId = resumeId ?? 'batch-' + Date.now();

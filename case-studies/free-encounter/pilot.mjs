@@ -1,9 +1,10 @@
 import {mkdir,mkdtemp,readFile,writeFile,cp,readdir,lstat} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,join,dirname} from 'node:path';
-import {fileURLToPath,pathToFileURL} from 'node:url';
+import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 import {validateGraph} from './graph.mjs';
+import {recordCodexTurn,replayTrace} from '../../dist/trace-inspector/index.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
 process.chdir(root);
@@ -32,9 +33,6 @@ const summary={batch,status:'running',runs:[]};
 const save=()=>json(join(batch,'summary.json'),summary);
 console.log('BATCH',batch);
 if(process.argv.includes('--dry-run')) {validateGraph({nodes:[],edges:[]});if(new Set(orders).size!==6||orders.some(x=>[...x].sort().join('')!=='KLW'))throw Error('Orders');summary.status='dry-run';await save();console.log('Frozen material preparation and permutations verified; no model calls.');process.exit(0);}
-const collector=resolve(process.env.TRACE_INSPECTOR_ROOT??join(root,'../thought-space'));
-const {recordCodexTurn}=await import(pathToFileURL(join(collector,'dist/collector/codex-app-server.js')));
-const {replayTrace}=await import(pathToFileURL(join(collector,'dist/replay/replay-trace.js')));
 async function turn(prompt,work,out,probe=false) {
  await writeFile(join(out,'prompt.txt'),prompt);
  const trace=await recordCodexTurn({prompt,cwd:work,timeoutMs:probe?config.probeTimeoutMs:config.timeoutMs,sandboxMode:probe?'readOnly':'workspaceWrite',networkAccess:false,model:config.model,reasoningEffort:config.effort});
