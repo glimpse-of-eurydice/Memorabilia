@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';
-import {loadSetA,validateMemory,probePrompt,probes} from '../observation/set-a-protocol.js';
-import {checkpoint,hash} from '../observation/probe-barrier.js';
+import {loadSetA,validateMemory,probePrompt,probes} from './set-a-protocol.js';
+import {checkpoint,hash} from './probe-barrier.js';
 import {ObservationReader} from '../workbench/adapters/observation-reader.js';
 
 test('inventory validates order and rejects modified material before model calls',async()=>{
@@ -34,7 +34,7 @@ test('observation reader reports pending probe and rejects traversal',async()=>{
 });
 
 import {readFile} from 'node:fs/promises';
-import {runSetA} from '../observation/set-a-runner.js';
+import {runSetA} from './set-a-runner.js';
 import {emptyCodexRuntimeMetadata} from '../trace-inspector/index.js';
 
 async function fixtureInventory(root:string){

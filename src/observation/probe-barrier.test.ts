@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {checkpoint, nextEncounterInput, runIsolatedProbe} from '../observation/probe-barrier.js';
-import {runMockPilot} from '../observation/mock-pilot.js';
+import {checkpoint, nextEncounterInput, runIsolatedProbe} from './probe-barrier.js';
+import {runMockPilot} from './mock-pilot.js';
 
 const fixture = () => checkpoint('E1', {notebook: 'original', graph: {nodes: [], edges: []}});
 test('M+/M- and malicious probe leave the next encounter byte-identical', async () => {
