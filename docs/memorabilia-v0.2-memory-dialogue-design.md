@@ -756,7 +756,7 @@ World 与 diary 的版本也必须由共享时间游标解析；查看 E8 时不
 
 | 位置 | 现在负责什么 | 建议改动 |
 | --- | --- | --- |
-| `src/collector/`、`src/adapters/codex/` | runtime 采集与事件归一化 | 继续复用；接入新调用角色与 run 关联信息 |
+| `src/trace-inspector/` | runtime 采集、事件归一化与证据回放 | 继续复用公开 `index.ts`；接入新调用角色与 run 关联信息 |
 | `src/observation/set-a-runner.ts` | Set A 的全量重写、接受与 probe | 保留旧协议，提取可复用调用/接受步骤给新 runner |
 | `src/observation/probe-barrier.ts` | graph + notebook checkpoint、mock barrier | 为 v0.2 增加完整 manifest / export；旧 schema 继续可读 |
 | `src/case-study/thought-space-v0/state.ts` | 冻结版 patch、衰减 | 参考其纯 reducer 和 delta 记录模式，另写 v0.2 reducer |

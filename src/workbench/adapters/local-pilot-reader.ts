@@ -1,6 +1,6 @@
 import { access, readdir, readFile, realpath } from "node:fs/promises";
 import { resolve, relative, join, dirname } from "node:path";
-import type { TraceEvent } from "../../core/trace-event.js";
+import type { TraceEvent } from "../../trace-inspector/index.js";
 import type { EncounterSummary, EncounterView, WorkbenchReader } from "../types.js";
 import { mapPilotEncounter, type PilotConfig, type PilotSourceBundle, type PilotStep, type PilotTraceManifest, type PilotTraceResult } from "./map-pilot.js";
 

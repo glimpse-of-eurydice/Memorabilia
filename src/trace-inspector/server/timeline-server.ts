@@ -114,7 +114,7 @@ export async function startTimelineServer(
       if (url.pathname === "/app.js") {
         await sendFile(
           response,
-          resolve(projectRoot, "dist/web/app.js"),
+          resolve(projectRoot, "dist/trace-inspector/server/timeline-app.js"),
           "text/javascript; charset=utf-8",
         );
         return;

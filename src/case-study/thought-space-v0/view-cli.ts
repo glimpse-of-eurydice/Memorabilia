@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
 import { access, readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { startTimelineServer, type TimelineServer } from "../../server/timeline-server.js";
-import { replayTrace } from "../../replay/replay-trace.js";
+import { replayTrace } from "../../trace-inspector/index.js";
+import { startTimelineServer, type TimelineServer } from "../../trace-inspector/server/timeline-server.js";
 import { loadViewerPayload, startThoughtSpaceViewerServer } from "./viewer-server.js";
 import type { ThoughtSpaceRunManifest } from "./types.js";
 

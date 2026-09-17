@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeCodexMessage } from "../adapters/codex/normalize-codex-message.js";
-import type { RawTraceRecord } from "../adapters/codex/raw-codex-message.js";
+import { normalizeCodexMessage, type RawTraceRecord } from "../index.js";
 
 const context = {
   traceId: "test-trace",

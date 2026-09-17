@@ -5,7 +5,7 @@ import type {
   TraceEvent,
   TraceEventKind,
   TraceEventStatus,
-} from "../core/trace-event.js";
+} from "../index.js";
 
 function event(
   sequence: number,

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { runDiagnostics } from "../analysis/run-diagnostics.js";
-import type { TraceSpan, TraceSpanStatus } from "../core/trace-span.js";
+import type { TraceSpan, TraceSpanStatus } from "../index.js";
 
 function span(
   status: TraceSpanStatus,

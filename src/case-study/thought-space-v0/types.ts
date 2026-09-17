@@ -1,4 +1,4 @@
-import type { CodexRuntimeMetadata } from "../../core/codex-runtime-metadata.js";
+import type { CodexRuntimeMetadata } from "../../trace-inspector/index.js";
 
 export const THOUGHT_SPACE_CONFIG_PATH =
   "fixtures/case-studies/thought-space-v0/config.json";

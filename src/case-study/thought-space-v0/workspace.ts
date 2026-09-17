@@ -2,8 +2,7 @@ import { createHash } from "node:crypto";
 import { copyFile, mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
-import type { TraceEvent } from "../../core/trace-event.js";
-import type { CodexRuntimeMetadata } from "../../core/codex-runtime-metadata.js";
+import type { CodexRuntimeMetadata, TraceEvent } from "../../trace-inspector/index.js";
 import { auditSubjectText, resolveInside } from "./schema.js";
 import type {
   EncounterManifest,

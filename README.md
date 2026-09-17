@@ -261,6 +261,12 @@ are not copied into its temporary workspace.
 - `src/workbench/`: data contract, local pilot adapter, shared time selection,
   Markdown rendering, HTTP server, and tests
 - `src/observation/`: checkpoint, probe-barrier, and Set A orchestration code
+- `src/trace-inspector/`: integrated runtime evidence module: Codex collector,
+  normalization, trace storage, replay, diagnostics, and the legacy timeline
+  server. Other modules use its public `index.ts` boundary.
+- `src/memory/`: reserved v0.2 boundary for episodic and world memory state
+- `src/consolidation/`: reserved v0.2 boundary for selective replay and
+  accepted consolidation updates
 - `encounters/set_A/`: public-domain/author-owned materials plus metadata-only
   references for locally acquired sources
 - `figures/`: README presentation images
@@ -277,8 +283,6 @@ are not copied into its temporary workspace.
   task, and credential-free synthetic inputs
 - `src/case-study/thought-space-v0/`: schema, isolation checks, reducer,
   retrieval, runner, viewer, and tests
-- `src/{collector,replay,adapters,analysis,core,server,store}/`: the minimal
-  Trace Inspector substrate required by this frozen apparatus
 - `examples/synthetic-v0-run/`: inspectable public output with no live trace or
   credential
 - `docs/`: apparatus boundary, reproduction protocol, and source provenance

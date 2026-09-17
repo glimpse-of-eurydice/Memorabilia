@@ -2,10 +2,11 @@ import { appendFile, copyFile, mkdir, readFile, rm, writeFile } from "node:fs/pr
 import { dirname, join, relative, resolve } from "node:path";
 import {
   recordCodexTurn,
+  replayTrace,
   type RecordCodexTurnOptions,
   type RecordCodexTurnResult,
-} from "../../collector/codex-app-server.js";
-import { replayTrace, type ReplayResult } from "../../replay/replay-trace.js";
+  type ReplayResult,
+} from "../../trace-inspector/index.js";
 import { validateGraphPatch } from "./schema.js";
 import { loadThoughtSpaceInputs, preflightThoughtSpaceV0 } from "./preflight.js";
 import { applyGraphPatch, emptySnapshot, sha256Text, stableJson } from "./state.js";

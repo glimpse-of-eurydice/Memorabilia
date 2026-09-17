@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { TraceEvent } from "../../core/trace-event.js";
+import type { TraceEvent } from "../../trace-inspector/index.js";
 import type {
   AgentRemark,
   ArtifactHistory,

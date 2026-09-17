@@ -1,11 +1,9 @@
 import {mkdir,mkdtemp,readFile,writeFile,rename,readdir,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
-import {recordCodexTurn,type RecordCodexTurnResult} from '../collector/codex-app-server.js';
-import {normalizeCodexMessage} from '../adapters/codex/normalize-codex-message.js';
+import {normalizeCodexMessage,recordCodexTurn,type RecordCodexTurnResult,type TraceEvent} from '../trace-inspector/index.js';
 import {mapPilotEncounter,type PilotSourceBundle} from '../workbench/adapters/map-pilot.js';
 import type {EncounterView} from '../workbench/types.js';
-import type {TraceEvent} from '../core/trace-event.js';
 import {checkpoint,hash,type MemoryState} from './probe-barrier.js';
 import {loadSetA,probes,probePrompt,validateMemory} from './set-a-protocol.js';
 import {isolatedConfig,subjectInstructions} from './isolated-runtime.js';

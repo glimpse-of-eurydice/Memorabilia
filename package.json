@@ -8,15 +8,16 @@
     "node": ">=22"
   },
   "scripts": {
+    "clean": "rm -rf dist",
     "probe:mock": "tsc && node dist/observation/mock-cli.js",
     "workbench": "tsc && node dist/workbench/view-cli.js",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "typecheck": "tsc --noEmit",
     "preflight": "tsc && node dist/case-study/thought-space-v0/preflight-cli.js",
     "demo": "tsc && node dist/case-study/thought-space-v0/demo-cli.js",
     "run": "tsc && node dist/case-study/thought-space-v0/run-cli.js",
     "view": "tsc && node dist/case-study/thought-space-v0/view-cli.js",
-    "test": "tsc && node --test dist/tests/*.test.js dist/case-study/thought-space-v0/*.test.js dist/workbench/*.test.js",
+    "test": "rm -rf dist && tsc && node --test dist/tests/*.test.js dist/trace-inspector/tests/*.test.js dist/case-study/thought-space-v0/*.test.js dist/workbench/*.test.js",
     "encounter:set-a": "tsc && node dist/observation/set-a-cli.js",
     "workbench:observation": "tsc && OBSERVATION_ROOT=.trace-inspector/observation PORT=4337 node dist/workbench/view-cli.js"
   },

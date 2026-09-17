@@ -35,7 +35,7 @@ test('observation reader reports pending probe and rejects traversal',async()=>{
 
 import {readFile} from 'node:fs/promises';
 import {runSetA} from '../observation/set-a-runner.js';
-import {emptyCodexRuntimeMetadata} from '../core/codex-runtime-metadata.js';
+import {emptyCodexRuntimeMetadata} from '../trace-inspector/index.js';
 
 async function fixtureInventory(root:string){
  const base=join(root,'encounters','set_A');await mkdir(base,{recursive:true});const lines=['encounters:'];
